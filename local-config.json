@@ -1,0 +1,14 @@
+{
+  "parameters": [
+    {
+      "name": "database",
+      "path": "/mongodb/database/linkbot/np",
+      "version": 1
+    },
+    {
+      "name": "databaseUser",
+      "path": "/mongodb/user/tyler",
+      "version": 1
+    }
+  ]
+}
