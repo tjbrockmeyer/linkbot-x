@@ -1,4 +1,4 @@
-import type {Config, ConfigContent, ConfigParameters} from './types/Config';
+import type {Config, ConfigContent, ConfigParameters} from '../types/Config';
 import aws from 'aws-sdk';
 import {promises as fs} from 'fs';
 import {v4 as uuid} from 'uuid';
@@ -14,32 +14,35 @@ let cachedConfig: aws.AppConfig.Types.Configuration;
 let cachedParameters: ConfigParameters;
 
 const requestAppConfig = async (): Promise<aws.AppConfig.Types.Configuration> => {
-    if(!process.env.APP_NAME || !process.env.ENV) {
-        throw new Error('APP_NAME and ENV environment variables are required');
-    }
-    if(process.env.NODE_ENV === 'production') {
-        const data = await appConfig.getConfiguration({
-            Application: process.env.APP_NAME,
-            Environment: process.env.ENV,
-            Configuration: 'config',
-            ClientId: clientId,
-            ClientConfigurationVersion: cachedConfig?.ConfigurationVersion
-        }).promise();
-        if(data.ConfigurationVersion !== cachedConfig?.ConfigurationVersion) {
-            return data;
-        }
-        return cachedConfig;
-    } else {
-        const contents = await fs.readFile('./local-config.json', {encoding: 'utf-8'});
+    if(process.env.NODE_ENV !== 'production') {
+        const contents = await fs.readFile('.config.json', {encoding: 'utf-8'});
         return {
-            Content: JSON.parse(contents),
+            Content: JSON.parse(contents).content,
             ConfigurationVersion: '1',
             ContentType: 'application/json'
         };
     }
+    if(!process.env.APP_NAME || !process.env.ENV) {
+        throw new Error('APP_NAME and ENV environment variables are required');
+    }
+    const data = await appConfig.getConfiguration({
+        Application: process.env.APP_NAME,
+        Environment: process.env.ENV,
+        Configuration: 'config',
+        ClientId: clientId,
+        ClientConfigurationVersion: cachedConfig?.ConfigurationVersion
+    }).promise();
+    if(data.ConfigurationVersion !== cachedConfig?.ConfigurationVersion) {
+        return data;
+    }
+    return cachedConfig;
 }
 
 const requestParameters = async (config: ConfigContent): Promise<ConfigParameters> => {
+    if(process.env.NODE_ENV !== 'production') {
+        const contents = await fs.readFile('.config.json', {encoding: 'utf-8'});
+        return JSON.parse(contents).parameters;
+    }
     const paths = config.parameters.map(p => p.path);
     const pathToName = new Map(config.parameters.map(p => [p.path, p.name]));
     const {Parameters} = await ssm.getParameters({Names: paths, WithDecryption: true}).promise();
@@ -50,10 +53,9 @@ const requestParameters = async (config: ConfigContent): Promise<ConfigParameter
             return [pathToName.get(p.Name as string), p.Value as string]
         }
     }));
-    return {
-        database: nameToValue.get('database'),
-        databaseUser: nameToValue.get('databaseUser'),
-    } as unknown as ConfigParameters;
+    const output: Record<string, unknown> = {}
+    config.parameters.forEach(p => output[p.name] = nameToValue.get(p.name));
+    return output as unknown as ConfigParameters
 }
 
 export default async (): Promise<Config> => {

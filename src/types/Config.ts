@@ -15,6 +15,9 @@ export type ConfigParameters = {
     databaseUser: {
         user: string,
         password: string
+    },
+    discordBot: {
+        token: string
     }
 }
 

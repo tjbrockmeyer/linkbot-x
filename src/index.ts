@@ -1,9 +1,12 @@
 
-
-
+import bot from './bot';
+import config from './utils/config';
 
 const main = async () => {
-    
+    const {parameters: {discordBot: {token}}} = await config();
+    const client = await bot(token);
 }
 
-main().catch(console.error);
+if(require.main === module) {
+    main().catch(console.error);
+}
