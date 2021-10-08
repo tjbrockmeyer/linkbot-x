@@ -4,12 +4,12 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "build": "rimraf dist && tsc",
     "start": "node dist",
     "dev": "nodemon -r dotenv/config src/index.ts",
     "test": "nyc --check-coverage --reporter none mocha",
-    "test:cov": "nyc --no-check-coverage --reporter html mocha && open-cli coverage/index.html",
-    "test:ci": "nyc --check-coverage --reporter text-summary mocha --no-colors",
-    "build": "rimraf dist && tsc"
+    "test:cov": "rimraf coverage && nyc --no-check-coverage --reporter html mocha && open-cli coverage/index.html",
+    "test:ci": "nyc --check-coverage --reporter text mocha --no-colors"
   },
   "keywords": [],
   "author": "",

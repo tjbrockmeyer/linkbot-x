@@ -8,7 +8,7 @@ export const joinWithAnd = (items: string[]) => {
     return items.slice(1).reduce((acc, val, i) => acc + (i < items.length - 2 ? ', ' : and) + val, items[0]);
 }
 
-const birthdayOwnerRegex = /(?:(\S+)'s )?birthday(?: of (\S+))?/;
+const birthdayOwnerRegex = /(?:(\S+)'s )?(?:birthday|bday)(?: of (\S+))?/i;
 
 export const findBirthdayOwnerInText = (text: string): string|null => {
     const match = birthdayOwnerRegex.exec(text);
