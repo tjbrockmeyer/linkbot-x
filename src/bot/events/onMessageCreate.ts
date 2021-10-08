@@ -1,5 +1,6 @@
+import { CommandSpec } from './../../typings/CommandSpec';
+import { runCommand } from './../commands/index';
 import { Client, Message } from "discord.js";
-import {BayesClassifier, PorterStemmer, WordTokenizer} from 'natural';
 import { classify } from "../../nlp/commandClassifier";
 import sampleMessages from "../sampleMessages";
 
@@ -13,7 +14,7 @@ export default async (client: Client, message: Message) => {
     const result = classify(text);
     switch(result.status) {
         case 'success':
-            await result.command?.run(client, message, text);
+            await runCommand(result.command as CommandSpec, client, message, text);
             break;
         case 'no results':
             await message.channel.send(sampleMessages('noIdea'));
