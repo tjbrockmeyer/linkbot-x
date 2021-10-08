@@ -1,8 +1,8 @@
-import { CommandSpec } from "../../../types/CommandSpec";
+import { CommandSpec } from "../../../typings/CommandSpec";
 
 export const lookupLeagueOfLegends: CommandSpec = {
-    name: 'lookup league of legends',
-    description: 'register your birthday to receive notifications in the chat when that day comes around again',
+    name: 'lookup league game',
+    description: 'lookup and paste a link to the league of legends game in the chat',
     trainingSet: [
         'lookup league of legends game',
         'show league game',

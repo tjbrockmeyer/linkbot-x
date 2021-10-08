@@ -6,8 +6,10 @@
   "scripts": {
     "start": "node dist",
     "dev": "nodemon -r dotenv/config src/index.ts",
-    "test": "mocha --require ts-node/register --require test/setup.ts '**/*.spec.ts'",
-    "build": "tsc"
+    "test": "nyc --check-coverage --reporter none mocha",
+    "test:cov": "nyc --no-check-coverage --reporter html mocha && open-cli coverage/index.html",
+    "test:ci": "nyc --check-coverage --reporter text-summary mocha --no-colors",
+    "build": "rimraf dist && tsc"
   },
   "keywords": [],
   "author": "",
@@ -20,6 +22,7 @@
     "uuid": "^8.3.2"
   },
   "devDependencies": {
+    "@istanbuljs/nyc-config-typescript": "^1.0.1",
     "@types/chai": "^4.2.22",
     "@types/mocha": "^9.0.0",
     "@types/natural": "^5.0.0",
@@ -31,9 +34,45 @@
     "dotenv": "^10.0.0",
     "mocha": "^9.1.2",
     "nodemon": "^2.0.13",
+    "nyc": "^15.1.0",
+    "open-cli": "^7.0.1",
+    "rimraf": "^3.0.2",
     "sinon": "^11.1.2",
     "sinon-chai": "^3.7.0",
+    "source-map-support": "^0.5.20",
     "ts-node": "^10.2.1",
     "typescript": "^4.4.3"
+  },
+  "mocha": {
+    "slow": 40,
+    "recursive": true,
+    "require": [
+      "ts-node/register/transpile-only",
+      "source-map-support/register",
+      "test/setup.ts"
+    ],
+    "spec": [
+      "test/**/*.ts"
+    ],
+    "reporter": [
+      "dot"
+    ]
+  },
+  "nyc": {
+    "include": [
+      "src/**/*.ts"
+    ],
+    "exclude": [
+      "test/**/*.spec.ts",
+      "src/index.ts",
+      "src/typings/*.ts",
+      "src/bot/index.ts",
+      "src/bot/sampleMessages.ts",
+      "src/database/index.ts"
+    ],
+    "branches": 90,
+    "lines": 90,
+    "functions": 90,
+    "statements": 90
   }
 }

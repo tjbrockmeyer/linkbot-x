@@ -1,5 +1,5 @@
 import { Guild, GuildMember, User } from "discord.js";
-import { CommandSpec } from "../../../types/CommandSpec";
+import { CommandSpec } from "../../../typings/CommandSpec";
 import { findDateInText } from "../../../utils/date";
 import { fuzzySearch, searchGuildMembers } from "../../../utils/search";
 import { joinWithAnd, findBirthdayOwnerInText } from "../../../utils/strings";

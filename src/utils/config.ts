@@ -1,4 +1,4 @@
-import type {Config, ConfigContent, ConfigParameters} from '../types/Config';
+import type {Config, ConfigContent, ConfigParameters} from '../typings/Config';
 import aws from 'aws-sdk';
 import {promises as fs} from 'fs';
 import {v4 as uuid} from 'uuid';

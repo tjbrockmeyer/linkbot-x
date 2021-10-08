@@ -1,4 +1,4 @@
-import { CommandSpec } from "../../../types/CommandSpec";
+import { CommandSpec } from "../../../typings/CommandSpec";
 
 export const showBirthday: CommandSpec = {
     name: 'show birthday',
