@@ -1,12 +1,10 @@
-
 import { expect } from 'chai';
-import {classify} from '../../src/nlp/commandClassifier';
+import {classify} from '../../../src/bot/commands/commandClassifier';
+import {setBirthday} from '../../../src/bot/commands/birthday/setBirthday';
+import {showBirthday} from '../../../src/bot/commands/birthday/showBirthday';
+import {lookupLeagueOfLegends} from '../../../src/bot/commands/leagueOfLegends/lookupLeagueGame';
 
-import {setBirthday} from '../../src/bot/commands/birthday/setBirthday';
-import {showBirthday} from '../../src/bot/commands/birthday/showBirthday';
-import {lookupLeagueOfLegends} from '../../src/bot/commands/leagueOfLegends/lookupLeagueGame';
-
-describe('nlp commandClassifier', () => {
+describe('bot commands commandClassifier', () => {
 
     describe('classify', () => {
         

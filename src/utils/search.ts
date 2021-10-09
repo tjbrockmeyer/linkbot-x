@@ -13,18 +13,18 @@ export const fuzzySearch = <T>(
     return results.filter(x => x.value > minimumMatchPercentage).sort((a, b) => a.value > b.value ? -1 : 1);
 }
 
-export const searchGuildMembers = async (guild: Guild, searchTerm: string, minimumMatchPercentage: number = 0.90): Promise<GuildMember[]|null> => {
-    const members = (await guild.members.fetch()).map(m => m);
-    const searchTermsList = [
-        members.map(m => m.displayName),
-        members.map(m => m.user.username),
-        members.map(m => `${m.user.username}#${m.user.discriminator}`)
-    ];
-    for(const searchTerms of searchTermsList) {
-        const searchResults = fuzzySearch(searchTerm, searchTerms, members);
-        if(searchResults.length) {
-            return searchResults.map(r => r.result);
-        }
-    }
-    return [];
-}
+// export const searchGuildMembers = async (guild: Guild, searchTerm: string, minimumMatchPercentage: number = 0.90): Promise<GuildMember[]|null> => {
+//     const members = (await guild.members.fetch()).map(m => m);
+//     const searchTermsList = [
+//         members.map(m => m.displayName),
+//         members.map(m => m.user.username),
+//         members.map(m => `${m.user.username}#${m.user.discriminator}`)
+//     ];
+//     for(const searchTerms of searchTermsList) {
+//         const searchResults = fuzzySearch(searchTerm, searchTerms, members);
+//         if(searchResults.length) {
+//             return searchResults.map(r => r.result);
+//         }
+//     }
+//     return [];
+// }

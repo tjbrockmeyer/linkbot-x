@@ -1,47 +1,49 @@
+import { sendMessage, sendSuccess } from '../../actions/sendMessageActions';
+import { upsertBirthday } from '../../../database/collections/birthdays';
+import { withSession } from './../../../database/index';
 import { Guild, GuildMember, User } from "discord.js";
 import { CommandSpec } from "../../../typings/CommandSpec";
-import { findDateInText } from "../../../utils/date";
-import { fuzzySearch, searchGuildMembers } from "../../../utils/search";
-import { joinWithAnd, findBirthdayOwnerInText } from "../../../utils/strings";
-
-
-const validate = (date: Date|null, target: User[]|GuildMember[]|null) => {
-    const errors = [];
-    if(date === null) {
-        errors.push('What is the date of your birthday? I can process a few different formats, but try something like 9/2/94');
-    }
-    if(target === null) {
-        errors.push('Whose birthday should I register? Ask me again, but include the name of someone in the Guild, like "...Tyler\'s birthday..."');
-    } else if(target.length === 0) {
-        errors.push('It looks like you were referring to someone who isn\'t in the Guild. Use someone\'s username or nickname, like "...Tyler\'s birthday..."');
-    } else if(target.length > 1) {
-        const names = target.map(x => {
-            const member = x as GuildMember;
-            return `${member.displayName} (${member.user.username}#${member.user.discriminator})`;
-        });
-        errors.push(`I couldn't decide which person you were talking about. I found ${joinWithAnd(names)}. Try again while being a bit more specific.`);
-    }
-    return errors;
-}
+import { findDateInText } from "../../../utils/dates";
+import { findBirthdayOwnerInText } from "../../../utils/strings";
+import { saveMessageError } from '../../actions/messageErrorActions';
+import emoji from '../../data/emoji';
 
 export const setBirthday: CommandSpec = {
-    name: 'set birthday',
+    name: 'set a birthday',
     description: 'register your birthday to receive notifications in the chat when that day comes around again',
     trainingSet: [
         'set birthday',
         'register birthday'
     ],
     restrictions: ['guildOnly'],
+
     run: async (client, message, text) => {
-        const date = findDateInText(text);
+        const channel = message.channel;
+        const guild = message.guild as Guild;
+        const maybeDate = findDateInText(text);
         const birthdayOwnerText = findBirthdayOwnerInText(text);
-        const target = text.includes('my birthday') ? [message.author] : birthdayOwnerText ? await searchGuildMembers(message.guild, birthdayOwnerText) : null;
-        
-        const errors = validate(date, target);
+        const maybeTarget = birthdayOwnerText === 'self' ? (await guild.members.fetch({user: message.author})).displayName : birthdayOwnerText;
+
+        const errors = validate(maybeDate, maybeTarget, birthdayOwnerText);
         if(errors.length) {
-            await message.channel.send(`I had some issues completing your request:\n  - ${errors.join('\n  - ')}`)
+            await saveMessageError(message, `I had some issues completing the request:\n  - ${errors.join('\n  - ')}`);
+            return;
         }
 
-        // add the birthday info to the database and return a message.
+        await withSession(async ctx => {
+            await upsertBirthday(ctx, guild.id, maybeTarget as string, maybeDate as Date);
+        });
+        await sendSuccess(message);
     }
+}
+
+const validate = (date: Date|null, target: string|null, ownerText: string|null): string[] => {
+    const errors = [];
+    if(target === null) {
+        errors.push('Whose birthday should I register? Ask me again, but include the name of someone, like "...Tyler\'s birthday..."');
+    }
+    if(date === null) {
+        errors.push(`What\'s ${target === null ? 'the' : ownerText === 'self' ? 'your' : `${target}'s`} birthday? I can process a few different formats, but try something like 9/2/94`);
+    }
+    return errors;
 }

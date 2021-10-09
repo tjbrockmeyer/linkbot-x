@@ -1,10 +1,11 @@
+import { DbContext as database } from './../typings/DbContext';
 
 import getConfig from '../utils/config';
 import {MongoClient, Db, DbOptions, ClientSession} from 'mongodb';
 
-const withSession = async (task: (db: Db, session: ClientSession) => Promise<unknown>, 
-                           dbName: string|undefined = undefined, 
-                           dbOptions: DbOptions|undefined = undefined) => {
+export const withSession = async <T>(
+        task: (ctx: database) => Promise<T>, dbName: string|undefined = undefined, dbOptions: DbOptions|undefined = undefined): Promise<T> => {
+            
     const {
         content: {databaseArgs}, 
         parameters: {database: {protocol, url}, databaseUser: {user, password}}
@@ -14,7 +15,7 @@ const withSession = async (task: (db: Db, session: ClientSession) => Promise<unk
     const session = client.startSession();
     const db = client.db(dbName, dbOptions);
     try {
-        await task(db, session);
+        return await task({db, session});
     } finally {
         await session.endSession();
         await client.close();

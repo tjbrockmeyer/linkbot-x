@@ -41,6 +41,7 @@
     "sinon-chai": "^3.7.0",
     "source-map-support": "^0.5.20",
     "ts-node": "^10.2.1",
+    "ts-sinon": "^2.0.2",
     "typescript": "^4.4.3"
   },
   "mocha": {
@@ -59,6 +60,7 @@
     ]
   },
   "nyc": {
+    "all": true,
     "include": [
       "src/**/*.ts"
     ],
@@ -66,9 +68,10 @@
       "test/**/*.spec.ts",
       "src/index.ts",
       "src/typings/*.ts",
+      "src/database/**/*.ts",
+      "src/bot/data/*.ts",
       "src/bot/index.ts",
-      "src/bot/sampleMessages.ts",
-      "src/database/index.ts"
+      "src/utils/config.ts"
     ],
     "branches": 90,
     "lines": 90,

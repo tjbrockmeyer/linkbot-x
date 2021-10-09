@@ -1,5 +1,8 @@
-import { Client, Message } from 'discord.js';
+import { sendMessage } from '../actions/sendMessageActions';
+import { Client, Emoji, Message } from 'discord.js';
+import emoji from '../data/emoji';
 import { CommandSpec } from './../../typings/CommandSpec';
+import { saveMessageError } from '../actions/messageErrorActions';
 
 
 export const runCommand = async (command: CommandSpec, client: Client, message: Message, text: string) => {
@@ -8,17 +11,21 @@ export const runCommand = async (command: CommandSpec, client: Client, message: 
             switch(restriction) {
                 case 'guildOnly':
                     return message.guild === null ? `I can only '${command.name}' in a Guild.` : null;
-                default:
-                    return null;
             }
         }).filter(Boolean);
 
         if(errors.length) {
-            await message.channel.send(
-                `I encountered ${errors.length > 1 ? 'some issues' : 'an issue'} while responding to your request:\n  - ${errors.join('\n  - ')}`);
+            await saveMessageError(
+                message,
+                `I couldn't complete your request:\n  - ${errors.join('\n  - ')}`);
             return;
         }
     }
 
-    await command.run(client, message, text);
+    try {
+        await command.run(client, message, text);
+    } catch(error) {
+        console.error(error);
+        saveMessageError(message, error as Error);
+    }
 }

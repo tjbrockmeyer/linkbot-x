@@ -1,10 +1,10 @@
 import { LogisticRegressionClassifier } from "natural";
 
-import { setBirthday } from "../bot/commands/birthday/setBirthday";
-import { showBirthday } from "../bot/commands/birthday/showBirthday";
-import { lookupLeagueOfLegends } from "../bot/commands/leagueOfLegends/lookupLeagueGame";
-import { ClassificationResult } from "../typings/ClassificationResult";
-import { CommandSpec } from "../typings/CommandSpec";
+import { setBirthday } from "./birthday/setBirthday";
+import { showBirthday } from "./birthday/showBirthday";
+import { lookupLeagueOfLegends } from "./leagueOfLegends/lookupLeagueGame";
+import { ClassificationResult } from "../../typings/ClassificationResult";
+import { CommandSpec } from "../../typings/CommandSpec";
 
 
 const acceptancePercentage = 0.85;

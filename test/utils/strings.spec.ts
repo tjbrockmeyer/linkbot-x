@@ -24,6 +24,9 @@ describe('utils strings', () => {
             {input: 'today is Sam\'s Birthday', output: 'Sam'},
             {input: 'set today as George\'s bday please', output: 'George'},
             {input: 'set tomorrow as the BirthDay of Aang', output: 'Aang'},
+            {input: 'set today as my birthday', output: 'self'},
+            {input: 'set today as my birtHday', output: 'self'},
+            {input: 'tomorrow is my bDay', output: 'self'},
         ].forEach(({input, output}) => it(`should find '${input}' as '${output}'`, () => {
             const result = findBirthdayOwnerInText(input);
             expect(result).equals(output);
@@ -38,5 +41,6 @@ describe('utils strings', () => {
             const result = findBirthdayOwnerInText(input);
             expect(result).is.null;
         }));
+        
     });
 });

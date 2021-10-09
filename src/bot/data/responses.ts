@@ -20,7 +20,7 @@ const messages = {
     ]
 }
 
-export default (type: keyof typeof messages) => {
+export const getRandomResponse = (type: keyof typeof messages) => {
     const choices = messages[type];
     return choices[randomInt(choices.length)];
 }

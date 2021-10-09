@@ -40,5 +40,14 @@ describe('utils search', () => {
             const result = fuzzySearch(input, items, items);
             expect(result, JSON.stringify(result, null, 2)).is.empty;
         }));
+
+        [
+            'bal'
+        ].forEach(input => it(`should find multiple results when searching for '${input}' with a low minimum match value`, () => {
+            const result = fuzzySearch(input, items, items, 0.7);
+            expect(result.length, JSON.stringify(result, null, 2)).greaterThan(1);
+            expect(result.map(r => r.result)).includes('bat');
+            expect(result.map(r => r.result)).includes('ball');
+        }));
     });
 });
