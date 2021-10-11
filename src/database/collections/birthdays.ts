@@ -1,5 +1,6 @@
 import { UpsertResult } from '../../typings/DbResults';
 import { DbContext } from '../../typings/DbContext';
+import { Birthday } from '../../typings/database/Birthday';
 
 const collection = 'birthdays';
 
@@ -11,4 +12,10 @@ export const upsertBirthday = async ({db, session}: DbContext, guildId: string, 
         upserted: result.upsertedCount > 0,
         upsertedCount: result.upsertedCount
     };
+};
+
+export const readBirthdays = async ({db, session}: DbContext, guildId: string): Promise<Birthday[]> => {
+    const cursor = db.collection(collection).find();
+    const results = await cursor.filter({guildId}).toArray();
+    return results as Birthday[]
 };

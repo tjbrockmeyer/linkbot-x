@@ -9,17 +9,47 @@ import * as sendMessageActions from '../../../../src/bot/actions/sendMessageActi
 import * as dbBirthdays from '../../../../src/database/collections/birthdays';
 import * as db from '../../../../src/database';
 import { expect } from "chai";
+import { Birthday } from "../../../../src/typings/database/Birthday";
 
 
 describe('bot commands birthday', () => {
 
     describe('showBirthday', () => {
-        const client = stubInterface<Client>();
+
         const text = 'my text';
-        const message = stubInterface<Message>();
-        
-        it('should do something', async () => {
+        let client: Client, message: Message, birthdays: Birthday[];
+        beforeEach(() => {
+            client = stubInterface();
+            message = stubInterface();
+            Object.defineProperty(message, 'channel', {value: stubInterface<TextChannel>()});
+            Object.defineProperty(message, 'guild', {value: stubInterface<Guild>()});
+            message.guild.id = 'my guild';
+            birthdays = [
+                {guildId: 'my guild', name: 'Me', date: new Date('09/02/1994')},
+                {guildId: 'my guild', name: 'Him', date: new Date('5/1/69')},
+            ];
+        });
+
+        const {ctx, stub_withSession} = stubWithSession();
+        const stub_readBirthdays = autoStub(dbBirthdays, 'readBirthdays', () => Promise.resolve(birthdays));
+
+        it('should search for birthdays from the guild', async () => {
             await showBirthday.run(client, message, text);
+            expect(stub_withSession).to.be.calledOnce;
+            expect(stub_readBirthdays).calledOnceWithExactly(ctx, message.guild.id);
+        });
+        
+        describe('when there are no known birthdays', () => {
+            beforeEach(() => stub_readBirthdays.resolves([]));
+            it('should send a message stating that there are no known birthdays', async () => {
+                await showBirthday.run(client, message, text);
+                expect(message.channel.send).calledOnceWithExactly(`I don't know any birthdays yet. Try something like "set my birthday to 9/2/94"`);
+            });
+        });
+        it('should reply with the full list of formatted birthdays', async () => {
+            await showBirthday.run(client, message, text);
+            const output = `These are the birthdays I know so far:\n  Me: 9/2/1994\n  Him: 5/1/1969`;
+            expect(message.channel.send).calledOnceWithExactly(output);
         });
     });
 });
