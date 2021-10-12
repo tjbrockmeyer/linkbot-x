@@ -1,7 +1,8 @@
-
-
 export type Birthday = {
     guildId: string,
     name: string,
-    date: Date
+    birthday: {
+        month: number,
+        day: number
+    }
 }

@@ -1,21 +1,28 @@
 import { UpsertResult } from '../../typings/DbResults';
 import { DbContext } from '../../typings/DbContext';
 import { Birthday } from '../../typings/database/Birthday';
+import { WithId } from 'mongodb';
 
 const collection = 'birthdays';
 
-const dateOnly = (date: Date) => new Date(date.getFullYear(), date.getMonth(), date.getDate(), 0, 0, 0, 0);
+export const createIndexes = async ({db, session}: DbContext) => {
+    db.collection(collection).createIndexes([
+        {key: {guildId: 1, name: 1}, unique: true},
+        {key: {birthday: 1}}
+    ]);
+};
 
 export const upsertBirthday = async ({db, session}: DbContext, guildId: string, name: string, date: Date): Promise<UpsertResult> => {
-    const result = await db.collection(collection).updateOne({guildId, name}, {$set: {date: dateOnly(date)}}, {upsert: true});
+    const birthday = {month: date.getMonth() + 1, day: date.getDate()}
+    const result = await db.collection(collection).updateOne({guildId, name}, {$set: birthday}, {upsert: true});
     return {
         upserted: result.upsertedCount > 0,
         upsertedCount: result.upsertedCount
     };
 };
 
-export const readBirthdays = async ({db, session}: DbContext, guildId: string): Promise<Birthday[]> => {
+export const readBirthdays = async ({db, session}: DbContext, guildId?: string, date?: Date): Promise<WithId<Birthday>[]> => {
     const cursor = db.collection(collection).find();
-    const results = await cursor.filter({guildId}).toArray();
-    return results as Birthday[]
+    const results = await cursor.filter({guildId, date}).toArray();
+    return results as WithId<Birthday>[]
 };

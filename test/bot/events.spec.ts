@@ -32,7 +32,7 @@ describe('bot events', () => {
         const randomResponse = 'my random response';
 
         const stub_runCommand = autoStub(commands, 'runCommand');
-        const stub_getRandomResponse = autoStub(responses, 'getRandomResponse', randomResponse);
+        const stub_getRandomResponse = autoStub(responses, 'getRandomResponse', () => randomResponse);
         const stub_classify = autoStub(commandClassifier, 'classify', () => classificationResult);
         const stub_saveMessageError = autoStub(messageErrorActions, 'saveMessageError');
 
@@ -78,7 +78,7 @@ describe('bot events', () => {
 
     });
     describe('onMessageReactionAdd', () => {
-        const stub_consoleLog = autoStub(console, 'log');
+        const stub_consoleLog = autoStub(console, 'info');
         
         it('should do something', async () => {
             const client = stubInterface<Client>();
@@ -88,7 +88,7 @@ describe('bot events', () => {
         });
     });
     describe('onReady', () => {
-        const stub_consoleLog = autoStub(console, 'log');
+        const stub_consoleLog = autoStub(console, 'info');
 
         it('should do something', async () => {
             const client = stubInterface<Client>();

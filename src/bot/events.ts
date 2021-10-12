@@ -28,11 +28,11 @@ export const onMessageCreate = async (client: Client, message: Message) => {
 
 
 export const onMessageReactionAdd = async (client: Client, reaction: MessageReaction | PartialMessageReaction, user: User | PartialUser) => {
-    console.log('reaction added:', reaction.emoji.name);
+    console.info('reaction added:', reaction.emoji.name);
 }
 
 export const onReady = async (client: Client) => {
-    console.log('connected to discord');
+    console.info('connected to discord');
 }
 
 export const onWarn = async (client: Client, message: string) => {

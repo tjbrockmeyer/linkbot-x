@@ -20,12 +20,7 @@ export const showBirthday: CommandSpec = {
         if(birthdays.length === 0) {
             await message.channel.send(`I don't know any birthdays yet. Try something like "set my birthday to 9/2/94"`);
         } else {
-            const dates = birthdays.map(b => {
-                const year = b.date.getFullYear();
-                const month = b.date.getMonth() + 1;
-                const day = b.date.getDate();
-                return `${month}/${day}/${year}`;
-            });
+            const dates = birthdays.map(b => `${b.birthday.month}/${b.birthday.day}`);
             const output = `These are the birthdays I know so far:\n  ${birthdays.map((b, i) => `${b.name}: ${dates[i]}`).join('\n  ')}`
             await message.channel.send(output);
         }

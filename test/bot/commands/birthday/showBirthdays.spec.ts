@@ -25,8 +25,8 @@ describe('bot commands birthday', () => {
             Object.defineProperty(message, 'guild', {value: stubInterface<Guild>()});
             message.guild.id = 'my guild';
             birthdays = [
-                {guildId: 'my guild', name: 'Me', date: new Date('09/02/1994')},
-                {guildId: 'my guild', name: 'Him', date: new Date('5/1/69')},
+                {guildId: 'my guild', name: 'Me', birthday: {month: 9, day: 2}},
+                {guildId: 'my guild', name: 'Him', birthday: {month: 5, day: 1}},
             ];
         });
 
@@ -48,7 +48,7 @@ describe('bot commands birthday', () => {
         });
         it('should reply with the full list of formatted birthdays', async () => {
             await showBirthday.run(client, message, text);
-            const output = `These are the birthdays I know so far:\n  Me: 9/2/1994\n  Him: 5/1/1969`;
+            const output = `These are the birthdays I know so far:\n  Me: 9/2\n  Him: 5/1`;
             expect(message.channel.send).calledOnceWithExactly(output);
         });
     });
