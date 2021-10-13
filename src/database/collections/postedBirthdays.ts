@@ -3,8 +3,8 @@ import { DbContext } from "../../typings/DbContext";
 
 const collection = 'postedBirthdays';
 
-export const createIndexes = async ({db}: DbContext) => {
-    db.collection(collection).createIndex({insertionTime: 1}, {expireAfterSeconds: 24 * 60 * 60});
+export const ensurePostedBirthdayIndexes = async ({db}: DbContext) => {
+    await db.collection(collection).createIndex({insertionTime: 1}, {expireAfterSeconds: 24 * 60 * 60});
 };
 
 export const getPostedBirthdayStatus = async ({db, session}: DbContext, ids: ObjectId[]): Promise<boolean[]> => {

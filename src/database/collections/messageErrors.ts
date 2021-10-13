@@ -4,7 +4,7 @@ import { DbContext } from '../../typings/DbContext';
 
 const collection = 'messageErrors';
 
-export const createIndexes = async ({db}: DbContext) => {
+export const ensureMessageErrorIndexes = async ({db}: DbContext) => {
     await db.collection(collection).createIndexes([
         {key: {messageId: 1}, unique: true},
         {key: {insertionTime: 1}, expireAfterSeconds: 3 * 24 * 60 * 60},

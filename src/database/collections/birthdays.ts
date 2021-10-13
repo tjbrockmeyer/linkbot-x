@@ -5,8 +5,8 @@ import { WithId } from 'mongodb';
 
 const collection = 'birthdays';
 
-export const createIndexes = async ({db, session}: DbContext) => {
-    db.collection(collection).createIndexes([
+export const ensureBirthdayIndexes = async ({db, session}: DbContext) => {
+    await db.collection(collection).createIndexes([
         {key: {guildId: 1, name: 1}, unique: true},
         {key: {birthday: 1}}
     ]);
@@ -14,7 +14,7 @@ export const createIndexes = async ({db, session}: DbContext) => {
 
 export const upsertBirthday = async ({db, session}: DbContext, guildId: string, name: string, date: Date): Promise<UpsertResult> => {
     const birthday = {month: date.getMonth() + 1, day: date.getDate()}
-    const result = await db.collection(collection).updateOne({guildId, name}, {$set: birthday}, {upsert: true});
+    const result = await db.collection(collection).updateOne({guildId, name}, {$set: {birthday}}, {upsert: true});
     return {
         upserted: result.upsertedCount > 0,
         upsertedCount: result.upsertedCount
