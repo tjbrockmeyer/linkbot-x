@@ -1,0 +1,18 @@
+version: "3.9"
+
+services:
+  bot:
+    image: 127.0.0.1:5000/linkbot
+    environment:
+      - APP_NAME=linkbot
+      - ENV=prod
+      - AWS_REGION=us-east-1
+      - AWS_ACCESS_KEY_ID
+      - AWS_SECRET_ACCESS_KEY
+    # logging:
+    #   driver: awslogs
+    #   options:
+    #     awslogs-region: us-east-1
+    #     awslogs-group: /app/linkbot/docker
+    #     awslogs-create-group: true
+    #     awslogs-multiline-pattern: "^\S+"

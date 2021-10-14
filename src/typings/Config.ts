@@ -1,3 +1,5 @@
+import { AppConfig } from "aws-sdk"
+
 export type ConfigContent = {
     parameters: {
         name: string,
@@ -24,4 +26,8 @@ export type ConfigParameters = {
 export type Config = {
     content: ConfigContent,
     parameters: ConfigParameters
+}
+
+export interface AWSAppConfig extends AppConfig.Configuration {
+    Content: ConfigContent;
 }

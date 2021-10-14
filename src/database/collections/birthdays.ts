@@ -5,7 +5,14 @@ import { WithId } from 'mongodb';
 
 const collection = 'birthdays';
 
-export const ensureBirthdayIndexes = async ({db, session}: DbContext) => {
+export const ensureBirthdaysCollection = async ({db, session}: DbContext) => {
+    try {
+        await db.createCollection(collection);
+    } catch(error) {
+        if(!(error as Error).message.includes('already exists')) {
+            throw error
+        }
+    }
     await db.collection(collection).createIndexes([
         {key: {guildId: 1, name: 1}, unique: true},
         {key: {birthday: 1}}

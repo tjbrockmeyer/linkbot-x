@@ -3,7 +3,14 @@ import { DbContext } from "../../typings/DbContext";
 
 const collection = 'postedBirthdays';
 
-export const ensurePostedBirthdayIndexes = async ({db}: DbContext) => {
+export const ensurePostedBirthdaysCollection = async ({db}: DbContext) => {
+    try {
+        await db.createCollection(collection);
+    } catch(error) {
+        if(!(error as Error).message.includes('already exists')) {
+            throw error
+        }
+    }
     await db.collection(collection).createIndex({insertionTime: 1}, {expireAfterSeconds: 24 * 60 * 60});
 };
 

@@ -1,4 +1,4 @@
-import type {Config, ConfigContent, ConfigParameters} from '../typings/Config';
+import type {AWSAppConfig, Config, ConfigContent, ConfigParameters} from '../typings/Config';
 import aws from 'aws-sdk';
 import {promises as fs} from 'fs';
 import {v4 as uuid} from 'uuid';
@@ -10,10 +10,10 @@ const clientId: string = uuid();
 const cacheLifetime = 2 * 60 * 1000;
 
 let expirationTime = 0;
-let cachedConfig: aws.AppConfig.Types.Configuration;
+let cachedConfig: AWSAppConfig;
 let cachedParameters: ConfigParameters;
 
-const requestAppConfig = async (): Promise<aws.AppConfig.Types.Configuration> => {
+const requestAppConfig = async (): Promise<AWSAppConfig> => {
     if(process.env.NODE_ENV !== 'production') {
         const contents = await fs.readFile('.config.json', {encoding: 'utf-8'});
         return {
@@ -33,7 +33,11 @@ const requestAppConfig = async (): Promise<aws.AppConfig.Types.Configuration> =>
         ClientConfigurationVersion: cachedConfig?.ConfigurationVersion
     }).promise();
     if(data.ConfigurationVersion !== cachedConfig?.ConfigurationVersion) {
-        return data;
+        return {
+            Content: data.Content ? JSON.parse(data.Content.toString('utf-8')) : undefined,
+            ConfigurationVersion: data.ConfigurationVersion,
+            ContentType: data.ContentType
+        };
     }
     return cachedConfig;
 }
