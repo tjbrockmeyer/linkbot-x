@@ -1,6 +1,6 @@
-import { Client, Guild, GuildMember, GuildMemberManager, Message, TextChannel, User } from "discord.js";
+import { Client, Message } from "discord.js";
 import { stubInterface } from "ts-sinon";
-import {lookupLeagueOfLegends} from '../../../../src/bot/commands/leagueOfLegends/lookupLeagueGame';
+import {lookupLeagueOfLegends} from './lookupLeagueGame';
 
 
 describe('bot commands leagueOfLegends', () => {

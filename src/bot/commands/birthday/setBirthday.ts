@@ -1,4 +1,4 @@
-import { sendMessage, sendSuccess } from '../../actions/sendMessageActions';
+import { sendSuccess } from '../../actions/sendMessageActions';
 import { upsertBirthday } from '../../../database/collections/birthdays';
 import { withSession } from './../../../database/index';
 import { Guild, GuildMember, User } from "discord.js";
@@ -6,7 +6,6 @@ import { CommandSpec } from "../../../typings/CommandSpec";
 import { findDateInText } from "../../../utils/dates";
 import { findBirthdayOwnerInText } from "../../../utils/strings";
 import { saveMessageError } from '../../actions/messageErrorActions';
-import emoji from '../../data/emoji';
 
 export const setBirthday: CommandSpec = {
     name: 'set a birthday',
@@ -18,11 +17,11 @@ export const setBirthday: CommandSpec = {
     restrictions: ['guildOnly'],
 
     run: async (client, message, text) => {
-        const channel = message.channel;
         const guild = message.guild as Guild;
+        const member = message.member as GuildMember;
         const maybeDate = findDateInText(text);
         const birthdayOwnerText = findBirthdayOwnerInText(text);
-        const maybeTarget = birthdayOwnerText === 'self' ? (await guild.members.fetch({user: message.author})).displayName : birthdayOwnerText;
+        const maybeTarget = birthdayOwnerText === 'self' ? member.displayName : birthdayOwnerText;
 
         const errors = validate(maybeDate, maybeTarget, birthdayOwnerText);
         if(errors.length) {

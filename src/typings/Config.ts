@@ -9,6 +9,11 @@ export type ConfigContent = {
     databaseArgs: string[]
 }
 
+export type Secrets = {
+    awsAccessKeyId?: string,
+    awsSecretAccessKey?: string,
+}
+
 export type ConfigParameters = {
     database: {
         protocol: string,
@@ -25,7 +30,8 @@ export type ConfigParameters = {
 
 export type Config = {
     content: ConfigContent,
-    parameters: ConfigParameters
+    parameters: ConfigParameters,
+    secrets: Secrets,
 }
 
 export interface AWSAppConfig extends AppConfig.Configuration {

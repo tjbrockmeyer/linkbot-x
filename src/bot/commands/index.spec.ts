@@ -6,15 +6,14 @@ import * as messageErrorActions from '../../../src/bot/actions/messageErrorActio
 import { expect } from "chai";
 import emoji from "../../../src/bot/data/emoji";
 import { SinonStub, stub } from "sinon";
-import {autoStub} from '../../stubs';
 
 
 describe('bot commands', () => {
     describe('runCommand', () => {
-
-
         let client: Client, message: Message, command: CommandSpec, text: string;
         let run: SinonStub;
+        let stub_saveMessageError: SinonStub;
+        let stub_consoleError: SinonStub;
         beforeEach(() => {
             client = stubInterface();
             message = stubInterface();
@@ -23,10 +22,10 @@ describe('bot commands', () => {
             command.restrictions = undefined;
             command.run = run = stub();
             text = 'my text';
-        });
 
-        const stub_saveMessageError = autoStub(messageErrorActions, 'saveMessageError');
-        const stub_consoleError = autoStub(console, 'error');
+            stub_saveMessageError = stub(messageErrorActions, 'saveMessageError');
+            stub_consoleError = stub(console, 'error');
+        });
 
         const restrictionErrorBase = `I couldn't complete your request:\n  - `;
 

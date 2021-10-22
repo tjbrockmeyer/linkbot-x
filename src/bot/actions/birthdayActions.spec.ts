@@ -1,9 +1,6 @@
 import { expect } from "chai";
-import { Channel, Client, Guild, GuildChannelManager, GuildManager, GuildMember, GuildMemberManager, Permissions, TextChannel, User, VoiceChannel } from "discord.js";
-import { createSandbox, SinonStub, stub } from "sinon";
-import { stubInterface } from "ts-sinon";
+import { Client, Guild, GuildManager, TextChannel } from "discord.js";
 import {postOccurringBirthdays} from '../../../src/bot/actions/birthdayActions';
-import { autoStub, autoMock, stubWithSession } from "../../stubs";
 import * as dbPostedBirthdays from '../../../src/database/collections/postedBirthdays';
 import * as dbBirthdays from '../../../src/database/collections/birthdays';
 import * as dates from '../../../src/utils/dates';
@@ -12,6 +9,9 @@ import * as guildActions from '../../../src/bot/actions/guildActions';
 import { Birthday } from "../../../src/typings/database/Birthday";
 import { WithId } from "mongodb";
 import {ObjectId} from 'bson';
+import { DbStub, stubClient, stubDb, stubGuild, stubGuildManager, stubTextChannel } from "../../testUtils/stubs";
+import { SinonStub, stub } from "sinon";
+import { StubbedInstance } from "ts-sinon";
 
 
 describe('bot actions birthdayActions', () => {
@@ -36,33 +36,41 @@ describe('bot actions birthdayActions', () => {
         ];
         const singleBirthdayPostedStatus: boolean[] = singleBirthdayList.map(() => false);
         const manyBirthdaysPostedStatus: boolean[] = manyBirthdaysList.map(() => false);
-        
-        const mock_systemChannel = autoMock<TextChannel>({
-            send: () => undefined,
-        });
-        const mock_postableChannel = autoMock<TextChannel>({
-            send: () => undefined,
-        });
-        const mock_guild = autoMock<Guild>(() => ({
-            systemChannel: mock_systemChannel.obj,
-        }));
-        const mock_clientGuilds = autoMock<GuildManager>(() => ({
-            fetch: () => mock_guild.obj,
-        }));
-        const mock_client = autoMock<Client>(() => ({
-            guilds: mock_clientGuilds.obj,
-        }));
-        const {ctx, stub_withSession} = stubWithSession();
-        const stub_readBirthdays = autoStub(dbBirthdays, 'readBirthdays', async () => singleBirthdayList);
-        const stub_getPostedBirthdayStatus = autoStub(dbPostedBirthdays, 'getPostedBirthdayStatus', async () => singleBirthdayPostedStatus);
-        const stub_insertPostedBirthdays = autoStub(dbPostedBirthdays, 'insertPostedBirthdays');
-        const stub_today = autoStub(dates, 'today', () => new Date('09/02/2020'));
-        const stub_joinWithAnd = autoStub(strings, 'joinWithAnd', () => 'tyler and guy');
-        const stub_getPostableChannel = autoStub(guildActions, 'getPostableChannel', async () => mock_postableChannel.obj);
+
+        let systemChannel: StubbedInstance<TextChannel>;
+        let postableChannel: StubbedInstance<TextChannel>;
+        let guild: StubbedInstance<Guild>;
+        let guildManager: StubbedInstance<GuildManager>;
+        let client: StubbedInstance<Client>;
+
+        let stub_readBirthdays: SinonStub;
+        let stub_getPostedBirthdayStatus: SinonStub;
+        let stub_insertPostedBirthdays: SinonStub;
+        let stub_today: SinonStub;
+        let stub_joinWithAnd: SinonStub;
+        let stub_getPostableChannel: SinonStub;
+        let dbStub: DbStub;
+
+        beforeEach(() => {
+            systemChannel = stubTextChannel();
+            postableChannel = stubTextChannel();
+            guild = stubGuild('guild id');
+            guildManager = stubGuildManager(guild);
+            client = stubClient();
+            client.guilds = guildManager;
+
+            stub_readBirthdays = stub(dbBirthdays, 'readBirthdays').resolves(singleBirthdayList);
+            stub_getPostedBirthdayStatus = stub(dbPostedBirthdays, 'getPostedBirthdayStatus').resolves(singleBirthdayPostedStatus);
+            stub_insertPostedBirthdays = stub(dbPostedBirthdays, 'insertPostedBirthdays');
+            stub_today = stub(dates, 'today').returns(new Date('09/02/2020'));
+            stub_joinWithAnd = stub(strings, 'joinWithAnd').returns('tyler and guy');
+            stub_getPostableChannel = stub(guildActions, 'getPostableChannel').resolves(postableChannel);
+            dbStub = stubDb();
+        })
 
         const itShouldNotFetchGuilds = () => it('should not fetch any guilds', async () => {
-            await postOccurringBirthdays(mock_client.obj);
-            expect(mock_clientGuilds.stub_fetch).to.have.not.been.called;
+            await postOccurringBirthdays(client);
+            expect(client.guilds.fetch).to.have.not.been.called;
         });
 
         describe('when today is not anyones birthday', () => {
@@ -77,10 +85,12 @@ describe('bot actions birthdayActions', () => {
             itShouldNotFetchGuilds();
         });
         describe('when a system channel exists for the guild', () => {
-            beforeEach(() => Object.defineProperty(mock_guild.obj, 'systemChannel', {value: mock_systemChannel.obj}));
+            beforeEach(() => {
+                Object.defineProperty(guild, 'systemChannel', {value: systemChannel})
+            });
             it('should post in the system channel', async () => {
-                await postOccurringBirthdays(mock_client.obj);
-                expect(mock_systemChannel.stub_send).calledOnce;
+                await postOccurringBirthdays(client);
+                expect(systemChannel.send).calledOnce;
             });
             describe('when there is only one birthday for the guild today', () => {
                 beforeEach(() => {
@@ -88,12 +98,12 @@ describe('bot actions birthdayActions', () => {
                     stub_getPostedBirthdayStatus.resolves(singleBirthdayPostedStatus);
                 });
                 it('should post the message with text for one person', async () => {
-                    await postOccurringBirthdays(mock_client.obj);
-                    expect(mock_systemChannel.stub_send).calledWithExactly('Today is tyler\'s birthday!');
+                    await postOccurringBirthdays(client);
+                    expect(systemChannel.send).calledWithExactly('Today is tyler\'s birthday!');
                 });
                 it('should mark in the database that the birthday was posted', async () => {
-                    await postOccurringBirthdays(mock_client.obj);
-                    expect(stub_insertPostedBirthdays).calledOnceWithExactly(ctx, [singleBirthdayList[0]._id]);
+                    await postOccurringBirthdays(client);
+                    expect(stub_insertPostedBirthdays).calledOnceWithExactly(dbStub.ctx, [singleBirthdayList[0]._id]);
                 });
             });
             describe('when there multiple birthdays for the guild today', () => {
@@ -102,21 +112,21 @@ describe('bot actions birthdayActions', () => {
                     stub_getPostedBirthdayStatus.resolves(manyBirthdaysPostedStatus);
                 });
                 it('should post the message with text for multiple people', async () => {
-                    await postOccurringBirthdays(mock_client.obj);
-                    expect(mock_systemChannel.stub_send).calledWithExactly('Today is tyler and guy\'s birthdays!');
+                    await postOccurringBirthdays(client);
+                    expect(systemChannel.send).calledWithExactly('Today is tyler and guy\'s birthdays!');
                 });
             });
         });
         describe('when there is not a system channel for the guild', () => {
-            beforeEach(() => Object.defineProperty(mock_guild.obj, 'systemChannel', {value: null}));
+            beforeEach(() => Object.defineProperty(guild, 'systemChannel', {value: null}));
             it('should search for a postable channel', async () => {
-                await postOccurringBirthdays(mock_client.obj);
-                expect(stub_getPostableChannel).calledOnceWithExactly(mock_client.obj, mock_guild.obj);
+                await postOccurringBirthdays(client);
+                expect(stub_getPostableChannel).calledOnceWithExactly(client, guild);
             });
             describe('when a postable channel is found', () => {
                 it('should post in that postable channel', async () => {
-                    await postOccurringBirthdays(mock_client.obj);
-                    expect(mock_postableChannel.stub_send).calledOnce;
+                    await postOccurringBirthdays(client);
+                    expect(postableChannel.send).calledOnce;
                 });
             });
         });

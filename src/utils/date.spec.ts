@@ -1,5 +1,5 @@
 import { expect } from "chai"
-import {findDateInText} from '../../src/utils/dates';
+import {findDateInText} from './dates';
 
 describe('utils date', () => {
 

@@ -49,12 +49,16 @@
     "slow": 40,
     "recursive": true,
     "require": [
-      "ts-node/register/transpile-only",
-      "source-map-support/register",
-      "test/setup.ts"
+      "ts-node/register/transpile-only"
+    ],
+    "file": [
+      "src/testUtils/setup.ts"
     ],
     "spec": [
-      "test/**/*.ts"
+      "src/**/*.ts"
+    ],
+    "exclude": [
+      "src/testUtils/*"
     ]
   },
   "nyc": {
@@ -63,7 +67,9 @@
       "src/**/*.ts"
     ],
     "exclude": [
-      "test/**/*.spec.ts",
+      "src/**/*.spec.ts",
+      "src/testUtils/*",
+
       "src/index.ts",
       "src/typings/*.ts",
       "src/database/**/*.ts",

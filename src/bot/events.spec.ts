@@ -1,40 +1,44 @@
 import { expect } from 'chai';
-import { autoStub } from '../stubs';
-import { onMessageCreate, onError, onWarn, onMessageReactionAdd, onReady } from '../../src/bot/events';
-import { stubInterface } from 'ts-sinon';
-import { Client, Message, MessageReaction, TextChannel, User } from 'discord.js';
-import { ClassificationResult } from '../../src/typings/ClassificationResult';
-import * as commands from '../../src/bot/commands';
-import * as responses from '../../src/bot/data/responses';
-import * as commandClassifier from '../../src/bot/commands/commandClassifier';
-import * as messageErrorActions from '../../src/bot/actions/messageErrorActions';
+import { onMessageCreate, onError, onWarn, onMessageReactionAdd, onReady } from './events';
+import { StubbedInstance, stubInterface } from 'ts-sinon';
+import { Client, Message, MessageReaction, User } from 'discord.js';
+import { ClassificationResult } from '../typings/ClassificationResult';
+import * as commands from './commands';
+import * as responses from './data/responses';
+import * as commandClassifier from './commands/commandClassifier';
+import * as messageErrorActions from './actions/messageErrorActions';
+import { stubClient, stubMessage } from '../testUtils/stubs';
+import { restore, SinonStub, stub } from 'sinon';
+import { CommandSpec } from '../typings/CommandSpec';
 
 
 describe('bot events', () => {
 
     describe('onMessageCreate', () => {
 
-        let client: Client, message: Message, classificationResult: ClassificationResult;
-        beforeEach(() => {
-            client = stubInterface();
-            client.user = stubInterface();
-            client.user.id = 'client user id';
-            message = stubInterface<Message>();
-            message.author = stubInterface();
-            message.author.id = 'message author id';
-            message.content = `${process.env.CMD_PREFIX || '!'} this is the message content`;
-            Object.defineProperty(message, 'channel', { value: stubInterface<TextChannel>() });
-            classificationResult = stubInterface();
-            classificationResult.command = stubInterface();
-            classificationResult.status = 'success';
-        });
-
         const randomResponse = 'my random response';
 
-        const stub_runCommand = autoStub(commands, 'runCommand');
-        const stub_getRandomResponse = autoStub(responses, 'getRandomResponse', () => randomResponse);
-        const stub_classify = autoStub(commandClassifier, 'classify', () => classificationResult);
-        const stub_saveMessageError = autoStub(messageErrorActions, 'saveMessageError');
+        let client: StubbedInstance<Client>;
+        let message: StubbedInstance<Message>;
+        let classificationResult: ClassificationResult;
+
+        let stub_runCommand: SinonStub;
+        let stub_getRandomResponse: SinonStub;
+        let stub_classify: SinonStub;
+        let stub_saveMessageError: SinonStub;
+
+        beforeEach(() => {
+            client = stubClient();
+            message = stubMessage(`${process.env.CMD_PREFIX || '!'} this is the message content`);
+            classificationResult = stubInterface();
+            classificationResult.command = stubInterface<CommandSpec>();
+            classificationResult.status = 'success';
+
+            stub_runCommand = stub(commands, 'runCommand');
+            stub_getRandomResponse = stub(responses, 'getRandomResponse').returns(randomResponse);
+            stub_classify = stub(commandClassifier, 'classify').returns(classificationResult);
+            stub_saveMessageError = stub(messageErrorActions, 'saveMessageError');
+        });
 
         const itShouldNotClassify = () =>
             it('should not attempt to classify the message', async () => {
@@ -51,7 +55,7 @@ describe('bot events', () => {
             });
 
         describe('when the message is from this client', () => {
-            beforeEach(() => message.author.id = client.user.id);
+            beforeEach(() => (message.author as User).id = (client.user as User).id);
             itShouldNotClassify();
         });
         describe('when the message does not start with the command prefix', () => {
@@ -78,7 +82,10 @@ describe('bot events', () => {
 
     });
     describe('onMessageReactionAdd', () => {
-        const stub_consoleLog = autoStub(console, 'info');
+        let stub_consoleInfo: SinonStub;
+        beforeEach(() => {
+            stub_consoleInfo = stub(console, 'info');
+        });
         
         it('should do something', async () => {
             const client = stubInterface<Client>();
@@ -88,7 +95,10 @@ describe('bot events', () => {
         });
     });
     describe('onReady', () => {
-        const stub_consoleLog = autoStub(console, 'info');
+        let stub_consoleInfo: SinonStub;
+        beforeEach(() => {
+            stub_consoleInfo = stub(console, 'info');
+        });
 
         it('should do something', async () => {
             const client = stubInterface<Client>();
@@ -97,9 +107,13 @@ describe('bot events', () => {
     });
     describe('onError', () => {
 
-        const client = stubInterface<Client>();
+        const client = stubClient();
         const error = new Error('test error');
-        const stub_consoleError = autoStub(console, 'error');
+
+        let stub_consoleError: SinonStub;
+        beforeEach(() => {
+            stub_consoleError = stub(console, 'error');
+        });
 
         it('should call console error with the error message', async () => {
             await onError(client, error);
@@ -108,9 +122,13 @@ describe('bot events', () => {
     });
     describe('onWarn', () => {
 
-        const client = stubInterface<Client>();
+        const client = stubClient();
         const warning = 'test warning'
-        const stub_consoleWarn = autoStub(console, 'warn');
+
+        let stub_consoleWarn: SinonStub;
+        beforeEach(() => {
+            stub_consoleWarn = stub(console, 'warn');
+        });
 
         it('should call console error with the error message', async () => {
             await onWarn(client, warning);

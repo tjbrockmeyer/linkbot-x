@@ -1,24 +1,27 @@
 
 import { expect } from 'chai';
 import { Client } from 'discord.js';
-import { SinonFakeTimers } from 'sinon';
-import sinon, {stubInterface} from 'ts-sinon';
-import * as birthdayActions from '../src/bot/actions/birthdayActions';
-import {startCheckBirthdaysProcess} from '../src/backgroundProcesses';
-import {autoStub} from './stubs';
+import { restore, SinonFakeTimers, SinonStub, stub } from 'sinon';
+import sinon, {StubbedInstance, stubInterface} from 'ts-sinon';
+import * as birthdayActions from './bot/actions/birthdayActions';
+import {startCheckBirthdaysProcess} from './backgroundProcesses';
+import { stubClient } from './testUtils/stubs';
 
 describe('backgroundProcesses', () => {
     describe('startCheckBirthdaysProcess', () => {
 
-        let client: Client, clock: SinonFakeTimers;
+        let stub_postBirthdays: SinonStub;
+        let client: StubbedInstance<Client>;
+        let clock: SinonFakeTimers;
+
         beforeEach(() => {
-            client = stubInterface();
+            stub_postBirthdays = stub(birthdayActions, 'postOccurringBirthdays').resolves(undefined);
+            client = stubClient();
             clock = sinon.useFakeTimers();
         });
         afterEach(() => {
             clock.restore();
         });
-        const stub_postBirthdays = autoStub(birthdayActions, 'postOccurringBirthdays', async () => undefined);
 
         it('should call postBirthdays immediately', () => {
             startCheckBirthdaysProcess(client);
