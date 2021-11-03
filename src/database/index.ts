@@ -1,16 +1,15 @@
 import { DbContext as database } from './../typings/DbContext';
 
-import getConfig from '../utils/config';
-import {MongoClient, Db, DbOptions, ClientSession} from 'mongodb';
+import {getConfig} from '../config';
+import {MongoClient, DbOptions} from 'mongodb';
 
 export const withSession = async <T>(
         task: (ctx: database) => Promise<T>, dbName: string|undefined = undefined, dbOptions: DbOptions|undefined = undefined): Promise<T> => {
-            
     const {
-        content: {databaseArgs}, 
-        parameters: {database: {protocol, url}, databaseUser: {user, password}}
+        general: {databaseArgs}, 
+        secrets: {dbProtocol, dbUrl, dbUser, dbPassword},
     } = await getConfig();
-    const uri = `${protocol}://${user}:${password}@${url}${!databaseArgs ? '' : ('?' + databaseArgs.join('&'))}`;
+    const uri = `${dbProtocol}://${dbUser}:${dbPassword}@${dbUrl}${!databaseArgs ? '' : ('?' + databaseArgs.join('&'))}`;
     const client = await MongoClient.connect(uri);
     const session = client.startSession();
     const db = client.db(dbName, dbOptions);

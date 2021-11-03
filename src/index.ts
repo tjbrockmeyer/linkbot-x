@@ -1,14 +1,14 @@
 
 import bot from './bot';
 import { startCheckBirthdaysProcess } from './backgroundProcesses';
-import config from './utils/config';
+import {getConfig} from './config';
 import ensureCollections from './database/ensureCollections';
 import { withSession } from './database';
 
 const main = async () => {
-    const {parameters: {discordBot: {token}}} = await config();
-    withSession(ctx => ensureCollections(ctx)).catch(console.error);
-    const client = await bot(token);
+    const {secrets: {discordToken}} = await getConfig();
+    withSession(async ctx => await ensureCollections(ctx)).catch(console.error);
+    const client = await bot(discordToken);
     startCheckBirthdaysProcess(client);
 }
 

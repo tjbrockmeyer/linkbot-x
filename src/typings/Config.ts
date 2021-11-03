@@ -1,7 +1,7 @@
-import { AppConfig } from "aws-sdk"
-
-export type ConfigContent = {
-    databaseArgs: string[]
+export type GeneralConfig = {
+    commandPrefix: string,
+    ownerId: string,
+    databaseArgs?: string[],
 }
 
 export type Secrets = {
@@ -13,10 +13,6 @@ export type Secrets = {
 }
 
 export type Config = {
-    content: ConfigContent,
+    general: GeneralConfig,
     secrets: Secrets,
-}
-
-export interface AWSAppConfig extends AppConfig.Configuration {
-    Content: ConfigContent;
 }

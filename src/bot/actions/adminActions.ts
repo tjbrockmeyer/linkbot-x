@@ -1,5 +1,5 @@
+import {getConfig} from '../../config'
 
-
-export const isAdmin = (userId: string) => {
-    return process.env.OWNER === userId;
+export const isAdmin = async (userId: string) => {
+    return (await getConfig()).general.ownerId === userId;
 }

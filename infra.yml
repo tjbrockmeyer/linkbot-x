@@ -1,0 +1,37 @@
+AWSTemplateFormatVersion: 2010-09-09
+
+Resources:
+  Role: 
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: linkbot-role
+      Policies:
+        - PolicyName: Inline
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement: 
+              - Effect: Allow
+                Action: 
+                  - logs:CreateLogStream
+                  - logs:PutLogEvents
+                  - logs:CreateLogGroup
+                Resource: 
+                  - !Sub arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/app/linkbot
+                  - !Sub arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/app/linkbot:log-stream:*
+              - Effect: Allow
+                Action: ssm:GetParameter*
+                Resource: 
+                  - !Sub arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/mongodb/database/linkbot/prod
+                  - !Sub arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/mongodb/user/tyler
+                  - !Sub arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/discord/bot/link-bot
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: lightsail.amazonaws.com
+            Action: sts:AssumeRole
+          - Effect: Allow
+            Principal:
+              AWS: arn:aws:iam::060868188835:user/tyler
+            Action: sts:AssumeRole
