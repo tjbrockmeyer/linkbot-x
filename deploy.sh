@@ -1,16 +1,21 @@
-cd /tmp/
-git clone https://github.com/tjbrockmeyer/linkbot-x.git
-cd linkbot-x
+set -e
+
+echo 'Building image...'
 docker build -t linkbot .
-if [[ -e ~/linkbot ]]; then
-    docker stop $(cat ~/linkbot)
-    docker rm $(cat ~/linkbot)
-fi
-docker run -d \
-  -e APP_NAME=linkbot \
-  -e ENV=prod \
-  -e ROLE_ARN=arn:aws:iam::060868188835:role/linkbot-role \
-  -e AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID \
-  -e AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY \
-  -e AWS_REGION=$AWS_REGION \
-  linkbot > ~/linkbot
+echo 'Sending image to lightsail instance...'
+docker save linkbot | bzip2 | lightsail-ssh.sh LS1 'docker load'
+
+echo 'Getting application credentials...'
+aws ssm get-parameter --with-decryption --name=' /linkbot/access-key' --output text --query 'Parameter.Value' > /tmp/creds
+lightsail-scp.sh LS1 /tmp/creds ' /tmp/linkbot-creds'
+rm -rf /tmp/creds
+
+echo 'Deploying application...'
+lightsail-ssh.sh LS1 \
+'docker stop $(cat ~/linkbot) &>/dev/null;
+docker rm $(cat ~/linkbot) &>/dev/null;
+mv /tmp/linkbot-creds ~/linkbot-access-key;
+docker run -d -e APP_NAME=linkbot -e ENV=prod -e NODE_ENV=production -e AWS_ACCESS_KEY_ID=$(jq -r .id < ~/linkbot-access-key) -e AWS_SECRET_ACCESS_KEY=$(jq -r .secret < ~/linkbot-access-key) -e AWS_REGION=us-east-1 linkbot > ~/linkbot;
+rm -rf ~/linkbot-access-key;'
+
+echo 'Done.'

@@ -1,10 +1,10 @@
 AWSTemplateFormatVersion: 2010-09-09
 
 Resources:
-  Role: 
-    Type: AWS::IAM::Role
+  User: 
+    Type: AWS::IAM::User
     Properties:
-      RoleName: linkbot-role
+      UserName: link-bot
       Policies:
         - PolicyName: Inline
           PolicyDocument:
@@ -24,14 +24,22 @@ Resources:
                   - !Sub arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/mongodb/database/linkbot/prod
                   - !Sub arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/mongodb/user/tyler
                   - !Sub arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/discord/bot/link-bot
-      AssumeRolePolicyDocument:
-        Version: 2012-10-17
-        Statement:
-          - Effect: Allow
-            Principal:
-              Service: lightsail.amazonaws.com
-            Action: sts:AssumeRole
-          - Effect: Allow
-            Principal:
-              AWS: arn:aws:iam::060868188835:user/tyler
-            Action: sts:AssumeRole
+              - Effect: Allow
+                Action: appconfig:GetConfiguration
+                Resource: 
+                  - !Sub arn:aws:appconfig:${AWS::Region}:${AWS::AccountId}:application/qj8a9hk
+                  - !Sub arn:aws:appconfig:${AWS::Region}:${AWS::AccountId}:application/qj8a9hk/environment/navsfyu
+                  - !Sub arn:aws:appconfig:${AWS::Region}:${AWS::AccountId}:application/qj8a9hk/configurationprofile/9nsh18t
+  AccessKey:
+    Type: AWS::IAM::AccessKey
+    Properties:
+      Serial: 0
+      Status: Active
+      UserName: !Ref User
+  AccessKeyParameter:
+    Type: Custom::SecureStringParameter
+    Properties:
+      ServiceToken: !ImportValue cfn-custom-resource-secure-string-parameter
+      Name: /linkbot/access-key
+      Description: Access key for the linkbot user
+      Value: !Sub '{"id":"${AccessKey}","secret":"${AccessKey.SecretAccessKey}"}'

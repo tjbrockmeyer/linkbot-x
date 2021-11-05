@@ -9,7 +9,7 @@ export const withSession = async <T>(
         general: {databaseArgs}, 
         secrets: {dbProtocol, dbUrl, dbUser, dbPassword},
     } = await getConfig();
-    const uri = `${dbProtocol}://${dbUser}:${dbPassword}@${dbUrl}${!databaseArgs ? '' : ('?' + databaseArgs.join('&'))}`;
+    const uri = `${dbProtocol}://${dbUser}:${dbPassword}@${dbUrl}${!databaseArgs || !databaseArgs.length ? '' : ('?' + databaseArgs.join('&'))}`;
     const client = await MongoClient.connect(uri);
     const session = client.startSession();
     const db = client.db(dbName, dbOptions);

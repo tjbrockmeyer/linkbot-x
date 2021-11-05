@@ -6,6 +6,7 @@ const appConfig = new aws.AppConfig();
 const clientId: string = uuid();
 
 let cachedConfig: AppConfig.Types.Configuration;
+let cachedContent: GeneralConfig;
 
 export const readAwsAppConfig = async (appName: string, env: string, configName: string = 'config'): Promise<GeneralConfig> => {
     const data = await appConfig.getConfiguration({
@@ -17,6 +18,7 @@ export const readAwsAppConfig = async (appName: string, env: string, configName:
     }).promise();
     if(data.ConfigurationVersion !== cachedConfig?.ConfigurationVersion) {
         cachedConfig = data;
+        cachedContent = JSON.parse(data.Content?.toString('utf-8') as string);
     }
-    return JSON.parse(data.Content?.toString('utf-8') as string);
+    return cachedContent;
 }

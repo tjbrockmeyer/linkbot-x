@@ -11,11 +11,6 @@ let expirationTime = 0;
 let cachedConfig: Config;
 
 export const getConfig = async (): Promise<Config> => {
-    const roleArn = process.env.ROLE_ARN;
-    if(!roleArn) {
-        throw new Error('the environment variable ROLE_ARN is required for logging into AWS');
-    }
-    startAwsAssumeRoleLoop(roleArn, 'linkbot-session');
     const now = Number(new Date());
     if(now >= expirationTime) {
         if(process.env.NODE_ENV !== 'production') {
