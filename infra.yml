@@ -1,6 +1,48 @@
 AWSTemplateFormatVersion: 2010-09-09
 
 Resources:
+  ConfigApplication:
+    Type: AWS::AppConfig::Application
+    Properties:
+      Name: linkbot
+      Description: linkbot configuration application
+  ConfigProfile:
+    Type: AWS::AppConfig::ConfigurationProfile
+    Properties:
+      Name: config
+      Description: main configuration
+      ApplicationId: !Ref ConfigApplication
+      LocationUri: hosted
+      Validators:
+        - Type: JSON_SCHEMA
+          Content: |
+            {
+              "type": "object",
+              "required": ["ownerId", "commandPrefix"],
+              "additionalProperties": false,
+              "properties": {
+                "ownerId": {"type": "string"},
+                "commandPrefix": {"type": "string"},
+                "databaseArgs": {
+                  "type": "array",
+                  "items": {"type": "string"}
+                }
+              }
+            }
+  ProdConfigEnvironment:
+    Type: AWS::AppConfig::Environment
+    Properties:
+      Name: prod
+      Description: production environment
+      ApplicationId: !Ref ConfigApplication
+      Monitors: []
+  
+  LogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: /app/linkbot
+      RetentionInDays: 7
+
   User: 
     Type: AWS::IAM::User
     Properties:
@@ -14,10 +56,8 @@ Resources:
                 Action: 
                   - logs:CreateLogStream
                   - logs:PutLogEvents
-                  - logs:CreateLogGroup
                 Resource: 
-                  - !Sub arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/app/linkbot
-                  - !Sub arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/app/linkbot:log-stream:*
+                  - !GetAtt LogGroup.Arn
               - Effect: Allow
                 Action: ssm:GetParameter*
                 Resource: 
@@ -27,9 +67,9 @@ Resources:
               - Effect: Allow
                 Action: appconfig:GetConfiguration
                 Resource: 
-                  - !Sub arn:aws:appconfig:${AWS::Region}:${AWS::AccountId}:application/qj8a9hk
-                  - !Sub arn:aws:appconfig:${AWS::Region}:${AWS::AccountId}:application/qj8a9hk/environment/navsfyu
-                  - !Sub arn:aws:appconfig:${AWS::Region}:${AWS::AccountId}:application/qj8a9hk/configurationprofile/9nsh18t
+                  - !Sub arn:aws:appconfig:${AWS::Region}:${AWS::AccountId}:application/${ConfigApplication}
+                  - !Sub arn:aws:appconfig:${AWS::Region}:${AWS::AccountId}:application/${ConfigApplication}/environment/${ProdConfigEnvironment}
+                  - !Sub arn:aws:appconfig:${AWS::Region}:${AWS::AccountId}:application/${ConfigApplication}/configurationprofile/${ConfigProfile}
   AccessKey:
     Type: AWS::IAM::AccessKey
     Properties:

@@ -12,10 +12,25 @@ rm -rf /tmp/creds
 
 echo 'Deploying application...'
 lightsail-ssh.sh LS1 \
-'docker stop $(cat ~/linkbot) &>/dev/null;
-docker rm $(cat ~/linkbot) &>/dev/null;
+"docker stop \$(cat ~/linkbot) &>/dev/null;
+docker rm \$(cat ~/linkbot) &>/dev/null;
 mv /tmp/linkbot-creds ~/linkbot-access-key;
-docker run -d -e APP_NAME=linkbot -e ENV=prod -e NODE_ENV=production -e AWS_ACCESS_KEY_ID=$(jq -r .id < ~/linkbot-access-key) -e AWS_SECRET_ACCESS_KEY=$(jq -r .secret < ~/linkbot-access-key) -e AWS_REGION=us-east-1 linkbot > ~/linkbot;
-rm -rf ~/linkbot-access-key;'
+
+docker run -d \
+    -e APP_NAME=linkbot \
+    -e ENV=prod \
+    -e NODE_ENV=production \
+    -e AWS_ACCESS_KEY_ID=\$(jq -r .id < ~/linkbot-access-key) \
+    -e AWS_SECRET_ACCESS_KEY=\$(jq -r .secret < ~/linkbot-access-key) \
+    -e AWS_REGION=us-east-1 \
+    linkbot > ~/linkbot;
+rm -rf ~/linkbot-access-key;"
+
+
+# export AWS_ACCESS_KEY_ID=\$(jq -r .id < ~/linkbot-access-key);
+# export AWS_SECRET_ACCESS_KEY=\$(jq -r .secret < ~/linkbot-access-key);
+    # --log-driver=awslogs \
+    # --log-opt awslogs-region=us-east-1 \
+    # --log-opt awslogs-group=/app/linkbot \
 
 echo 'Done.'
