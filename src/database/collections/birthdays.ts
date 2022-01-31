@@ -2,6 +2,7 @@ import { UpsertResult } from '../../typings/DbResults';
 import { DbContext } from '../../typings/DbContext';
 import { Birthday } from '../../typings/database/Birthday';
 import { WithId } from 'mongodb';
+import { removeUndefinedKeys } from '../../utils/objects';
 
 const collection = 'birthdays';
 
@@ -29,7 +30,7 @@ export const upsertBirthday = async ({db, session}: DbContext, guildId: string, 
 };
 
 export const readBirthdays = async ({db, session}: DbContext, guildId?: string, date?: Date): Promise<WithId<Birthday>[]> => {
-    const cursor = db.collection(collection).find();
-    const results = await cursor.filter({guildId, date}).toArray();
-    return results as WithId<Birthday>[]
+    const birthday = date && {month: date?.getMonth() + 1, day: date.getDate()};
+    const results = await db.collection(collection).find(removeUndefinedKeys({guildId, birthday})).toArray();
+    return results as WithId<Birthday>[];
 };

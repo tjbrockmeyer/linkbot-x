@@ -7,6 +7,7 @@ import * as commands from './commands';
 import * as responses from './data/responses';
 import * as commandClassifier from './commands/commandClassifier';
 import * as messageErrorActions from './actions/messageErrorActions';
+import * as backgroundProcesses from '../backgroundProcesses';
 import { stubClient, stubMessage } from '../testUtils/stubs';
 import { restore, SinonStub, stub } from 'sinon';
 import { CommandSpec } from '../typings/CommandSpec';
@@ -96,13 +97,16 @@ describe('bot events', () => {
     });
     describe('onReady', () => {
         let stub_consoleInfo: SinonStub;
+        let stub_startCheckBirthdaysProcess: SinonStub;
         beforeEach(() => {
             stub_consoleInfo = stub(console, 'info');
+            stub_startCheckBirthdaysProcess = stub(backgroundProcesses, 'startCheckBirthdaysProcess');
         });
 
-        it('should do something', async () => {
+        it('should start the birthday check process', async () => {
             const client = stubInterface<Client>();
             await onReady(client);
+            expect(stub_startCheckBirthdaysProcess).to.have.been.calledOnce;
         });
     });
     describe('onError', () => {

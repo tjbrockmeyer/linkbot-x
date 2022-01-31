@@ -1,5 +1,18 @@
 set -e
 
+VERSION=$1
+if [[ -z $VERSION ]]; then
+    echo "usage: $0 <version>"
+    exit 1
+fi
+
+git clone git@github.com:tjbrockmeyer/linkbot-x /tmp/linkbot
+cd /tmp/linkbot
+if ! git checkout "tags/$VERSION"; then
+    echo "could not check out a tag with the version $VERSION"
+    exit 1
+fi
+
 echo 'Building image...'
 docker build -t linkbot .
 echo 'Sending image to lightsail instance...'
@@ -19,6 +32,7 @@ mv /tmp/linkbot-creds ~/linkbot-access-key;
 docker run -d \
     -e APP_NAME=linkbot \
     -e ENV=prod \
+    -e TIMEZONE_OFFSET=-6 \
     -e NODE_ENV=production \
     -e AWS_ACCESS_KEY_ID=\$(jq -r .id < ~/linkbot-access-key) \
     -e AWS_SECRET_ACCESS_KEY=\$(jq -r .secret < ~/linkbot-access-key) \

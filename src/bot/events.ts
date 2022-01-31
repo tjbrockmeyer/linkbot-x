@@ -4,6 +4,7 @@ import { Client, Message, MessageReaction, PartialMessageReaction, PartialUser, 
 import { classify } from "./commands/commandClassifier";
 import { getRandomResponse } from "./data/responses";
 import { saveMessageError } from './actions/messageErrorActions';
+import { startCheckBirthdaysProcess } from '../backgroundProcesses';
 
 const prefix = process.env.CMD_PREFIX || '!';
 
@@ -33,6 +34,7 @@ export const onMessageReactionAdd = async (client: Client, reaction: MessageReac
 
 export const onReady = async (client: Client) => {
     console.info('connected to discord');
+    startCheckBirthdaysProcess(client);
 }
 
 export const onWarn = async (client: Client, message: string) => {

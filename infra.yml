@@ -36,7 +36,7 @@ Resources:
       Description: production environment
       ApplicationId: !Ref ConfigApplication
       Monitors: []
-  
+
   LogGroup:
     Type: AWS::Logs::LogGroup
     Properties:
