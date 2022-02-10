@@ -15,5 +15,6 @@ npm test
 npm run build
 
 git tag -a "$VERSION" -m "Release version $VERSION"
+git push --tags
 
 echo "Tag finished!"

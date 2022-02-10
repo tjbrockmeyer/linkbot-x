@@ -47,4 +47,5 @@ rm -rf ~/linkbot-access-key;"
     # --log-opt awslogs-region=us-east-1 \
     # --log-opt awslogs-group=/app/linkbot \
 
+rm -rf /tmp/linkbot
 echo 'Done.'
