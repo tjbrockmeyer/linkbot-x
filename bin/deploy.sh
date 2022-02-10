@@ -29,11 +29,10 @@ rm -rf /tmp/creds
 
 echo 'Deploying application...'
 lightsail-ssh.sh "$LIGHTSAIL_INSTANCE" \
-"docker stop \$(cat ~/$APP_NAME) &>/dev/null;
-docker rm \$(cat ~/$APP_NAME) &>/dev/null;
+"docker stop $APP_NAME &>/dev/null;
 mv /tmp/$APP_NAME-creds ~/$APP_NAME-access-key;
 
-docker run -d \
+docker run -dit --rm --name $APP_NAME \
     -e APP_NAME=$APP_NAME \
     -e ENV=prod \
     -e TIMEZONE_OFFSET=-6 \
@@ -41,7 +40,7 @@ docker run -d \
     -e AWS_ACCESS_KEY_ID=\$(jq -r .id < ~/$APP_NAME-access-key) \
     -e AWS_SECRET_ACCESS_KEY=\$(jq -r .secret < ~/$APP_NAME-access-key) \
     -e AWS_REGION=us-east-1 \
-    $APP_NAME > ~/$APP_NAME;
+    $APP_NAME;
 rm -rf ~/$APP_NAME-access-key;"
 
 rm -rf /tmp/$APP_NAME
