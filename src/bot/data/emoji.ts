@@ -1,4 +1,8 @@
 export default {
     whiteCheckMark: '✅',
-    x: '❌'
+    x: '❌',
+    previousTrack: '⏮️',
+    nextTrack: '⏭️',
+    arrowBackward: '⬅️',
+    arrowForward: '➡️',
 }
