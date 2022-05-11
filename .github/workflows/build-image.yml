@@ -7,6 +7,7 @@ on:
       - src/**/*.ts
   workflow_dispatch:
 env:
+  ROLE: arn:aws:iam::060868188835:role/linkbot-github-runner-role
   ECR_REPO_NAME: linkbot
 jobs:
   buildImage:
@@ -19,7 +20,7 @@ jobs:
       - uses: actions/checkout@v3
       - uses: aws-actions/configure-aws-credentials@v1
         with:
-          role-to-assume: arn:aws:iam::<ACCOUNT_ID>:role/github-actions-role
+          role-to-assume: ${{ env.ROLE }}
           aws-region: ${{ matrix.region }}
       - id: login-ecr
         uses: aws-actions/amazon-ecr-login@v1
