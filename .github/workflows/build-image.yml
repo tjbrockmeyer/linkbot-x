@@ -13,6 +13,9 @@ jobs:
   buildImage:
     name: Build Image
     runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: read
     strategy:
       matrix:
         region: [us-east-1]
