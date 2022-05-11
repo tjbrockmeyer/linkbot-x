@@ -1,6 +1,7 @@
 name: Lightsail Deploy
 on:
   workflow_call:
+  workflow_dispatch:
 env:
   ROLE: arn:aws:iam::060868188835:role/linkbot-github-runner-role
 jobs:

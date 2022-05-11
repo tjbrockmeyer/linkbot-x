@@ -5,6 +5,7 @@ on:
       - $default-branch
     paths:
       - src/**/*.ts
+  workflow_dispatch:
 env:
   ECR_REPO_NAME: linkbot
 jobs:
