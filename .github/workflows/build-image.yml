@@ -1,0 +1,32 @@
+name: Build Image
+on:
+  push:
+    branches:
+      - $default-branch
+    paths:
+      - src/**/*.ts
+env:
+  ECR_REPO_NAME: linkbot
+jobs:
+  buildImage:
+    name: Build Image
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        region: [us-east-1]
+    steps:
+      - uses: actions/checkout@v3
+      - uses: aws-actions/configure-aws-credentials@v1
+        with:
+          role-to-assume: arn:aws:iam::<ACCOUNT_ID>:role/github-actions-role
+          aws-region: ${{ matrix.region }}
+      - id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v1
+      - name: Build and Push Image
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          IMAGE_TAG: dev-${{ github.sha }}
+        run: |
+          docker build -t $ECR_REGISTRY/$ECR_REPO_NAME:$IMAGE_TAG .
+          docker push $ECR_REGISTRY/$ECR_REPO_NAME:$IMAGE_TAG
+          echo "::set-output name=image::$ECR_REGISTRY/$ECR_REPO_NAME:$IMAGE_TAG"

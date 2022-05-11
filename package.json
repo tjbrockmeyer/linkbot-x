@@ -4,13 +4,16 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "build": "rimraf dist && tsc",
+    "build": "tsc",
     "start": "node dist",
     "dev": "nodemon -r dotenv/config src/index.ts",
+    "docker:build": "docker build -t linkbot .",
+    "docker:run": "docker run -dit --rm --name=linkbot -e APP_NAME=linkbot -e ENV=prod -e TIMEZONE_OFFSET=-5 -e NODE_ENV=production -e AWS_REGION=us-east-1 -v ~/.aws:/root/.aws linkbot",
     "test": "nyc --check-coverage --reporter text mocha --reporter spec",
     "test:min": "nyc --check-coverage --reporter text-summary mocha --reporter min",
     "test:cov": "rimraf coverage && nyc --no-check-coverage --reporter html mocha --reporter progress && open-cli coverage/index.html",
-    "test:ci": "nyc --check-coverage --reporter text-summary mocha --reporter min --no-colors"
+    "test:ci": "nyc --check-coverage --reporter text-summary mocha --reporter min --no-colors",
+    "clean": "rimraf node_modules dist"
   },
   "keywords": [],
   "author": "",

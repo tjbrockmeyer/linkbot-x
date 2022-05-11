@@ -29,7 +29,8 @@ lightsail-ssh.sh LS1 \
 docker rm \$(cat ~/linkbot) &>/dev/null;
 mv /tmp/linkbot-creds ~/linkbot-access-key;
 
-docker run -d \
+docker run -dit \
+    --name=linkbot \
     -e APP_NAME=linkbot \
     -e ENV=prod \
     -e TIMEZONE_OFFSET=-6 \

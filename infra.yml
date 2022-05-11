@@ -1,85 +1,46 @@
-AWSTemplateFormatVersion: 2010-09-09
+version: master
+name: linkbot
+default: prodDeploy
+deployments:
+  ecrRepo:
+    provider: aws
+    using: ecr-repo
+    regions: [us-east-1]
+    parameters:
+      AppName: "{{ ref name }}"
+  
+  githubActionsRole:
+    provider: aws
+    using: gha-role
+    regions: [us-east-1]
+    parameters:
+      AppName: "{{ ref name }}"
+      RepoOrgAndName: tjbrockmeyer/linkbot-x
+      Policies: 
+        - Effect: Allow
+          Action: 
+            - ecr:GetAuthorizationToken
+          Resource: '*'
+        - Effect: Allow
+          Action:
+            - ecr:GetDownloadUrlForLayer
+            - ecr:BatchGetImage
+            - ecr:BatchCheckLayerAvailability
+            - ecr:PutImage
+            - ecr:InitiateLayerUpload
+            - ecr:UploadLayerPart
+            - ecr:CompleteLayerUpload
+          Resource: 
+            Fn::ImportValue: '{{ ref name }}-ecr-repo-arn'
 
-Resources:
-  ConfigApplication:
-    Type: AWS::AppConfig::Application
-    Properties:
-      Name: linkbot
-      Description: linkbot configuration application
-  ConfigProfile:
-    Type: AWS::AppConfig::ConfigurationProfile
-    Properties:
-      Name: config
-      Description: main configuration
-      ApplicationId: !Ref ConfigApplication
-      LocationUri: hosted
-      Validators:
-        - Type: JSON_SCHEMA
-          Content: |
-            {
-              "type": "object",
-              "required": ["ownerId", "commandPrefix"],
-              "additionalProperties": false,
-              "properties": {
-                "ownerId": {"type": "string"},
-                "commandPrefix": {"type": "string"},
-                "databaseArgs": {
-                  "type": "array",
-                  "items": {"type": "string"}
-                }
-              }
-            }
-  ProdConfigEnvironment:
-    Type: AWS::AppConfig::Environment
-    Properties:
-      Name: prod
-      Description: production environment
-      ApplicationId: !Ref ConfigApplication
-      Monitors: []
-
-  LogGroup:
-    Type: AWS::Logs::LogGroup
-    Properties:
-      LogGroupName: /app/linkbot
-      RetentionInDays: 7
-
-  User: 
-    Type: AWS::IAM::User
-    Properties:
-      UserName: link-bot
-      Policies:
-        - PolicyName: Inline
-          PolicyDocument:
-            Version: 2012-10-17
-            Statement: 
-              - Effect: Allow
-                Action: 
-                  - logs:CreateLogStream
-                  - logs:PutLogEvents
-                Resource: 
-                  - !GetAtt LogGroup.Arn
-              - Effect: Allow
-                Action: ssm:GetParameter*
-                Resource: 
-                  - !Sub arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/mongodb/database/linkbot/prod
-                  - !Sub arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/mongodb/user/tyler
-                  - !Sub arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/discord/bot/link-bot
-              - Effect: Allow
-                Action: appconfig:GetConfiguration
-                Resource: 
-                  - !Sub arn:aws:appconfig:${AWS::Region}:${AWS::AccountId}:application/${ConfigApplication}
-                  - !Sub arn:aws:appconfig:${AWS::Region}:${AWS::AccountId}:application/${ConfigApplication}/environment/${ProdConfigEnvironment}
-                  - !Sub arn:aws:appconfig:${AWS::Region}:${AWS::AccountId}:application/${ConfigApplication}/configurationprofile/${ConfigProfile}
-  AccessKey:
-    Type: AWS::IAM::AccessKey
-    Properties:
-      Serial: 0
-      Status: Active
-      UserName: !Ref User
-  AccessKeyParameter:
-    Type: Custom::SecureStringParameter
-    Properties:
-      ServiceToken: !ImportValue cfn-custom-resource-secure-string-parameter
-      Name: /linkbot/access-key
-      Description: Access key for the linkbot user
-      Value: !Sub '{"id":"${AccessKey}","secret":"${AccessKey.SecretAccessKey}"}'
+  prodDeploy:
+    provider: aws
+    using: lightsail-docker-deployment
+    regions: [us-east-1]
+    parameters:
+      AppName: "{{ ref name }}"
+      Env: prod
+      LightsailInstance: LS1
+      LightsailKeyParameter: /lightsail/LS1/private-key
+      AppRolePolicies: []
+      ComposeFile: "{{ file ./compose/prod.yml }}"
