@@ -8,7 +8,7 @@
     "start": "node dist",
     "dev": "cross-env AWS_SDK_LOAD_CONFIG=1 nodemon src/index.ts",
     "docker:build": "docker build -t linkbot .",
-    "docker:start": "bash -c \"docker run -it --rm --name=linkbot -e NODE_ENV=production -e AWS_SDK_LOAD_CONFIG=1 --mount type=bind,source=/c/users/$(whoami)/.aws,target=/root/.aws linkbot\"",
+    "docker:start": "bash -c \"docker run -it --rm --name=linkbot -e AWS_SDK_LOAD_CONFIG=1 --mount type=bind,source=/c/users/$(whoami)/.aws,target=/root/.aws linkbot\"",
     "test": "nyc --check-coverage --reporter text mocha --reporter spec",
     "test:min": "nyc --check-coverage --reporter text-summary mocha --reporter min",
     "test:cov": "rimraf coverage && nyc --no-check-coverage --reporter html mocha --reporter progress && open-cli coverage/index.html",

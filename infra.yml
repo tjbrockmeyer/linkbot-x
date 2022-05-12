@@ -35,7 +35,6 @@ deployments:
 
   prodDeploy:
     provider: aws
-    disableRollback: true
     using: lightsail-docker-deployment
     regions: [us-east-1]
     parameters:
@@ -43,4 +42,4 @@ deployments:
       Env: prod
       LightsailInstance: LS1
       ComposeFile: "{{ file ./compose/prod.yml }}"
-      Serial: 0
+      Serial: 1
