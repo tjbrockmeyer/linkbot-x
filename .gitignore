@@ -2,10 +2,6 @@
 # dependencies
 node_modules/
 
-# configuration
-.env
-.config.json
-
 # generated files
 dist/
 types/

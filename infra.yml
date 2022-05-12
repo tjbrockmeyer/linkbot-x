@@ -35,12 +35,12 @@ deployments:
 
   prodDeploy:
     provider: aws
+    disableRollback: true
     using: lightsail-docker-deployment
     regions: [us-east-1]
     parameters:
       AppName: "{{ ref name }}"
       Env: prod
       LightsailInstance: LS1
-      LightsailKeyParameter: /lightsail/LS1/private-key
-      AppRolePolicies: []
       ComposeFile: "{{ file ./compose/prod.yml }}"
+      Serial: 0
