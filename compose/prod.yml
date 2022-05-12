@@ -1,5 +1,5 @@
 services:
   linkbot:
-    image: 060868188835.dkr.ecr.us-east-1.amazonaws.com/linkbot:dev-205251
+    image: 060868188835.dkr.ecr.us-east-1.amazonaws.com/linkbot:dev-5e5b98
     environment:
       - AWS_SDK_LOAD_CONFIG=1
