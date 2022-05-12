@@ -5,7 +5,7 @@
   },
   "database": {
     "args": [],
-    "protocol": "::ssm /mongodb/database/linkbot/np protocol",
+    "protocol": "::ssm /mongodb/database/linkbot/prod protocol",
     "url": "::ssm /mongodb/database/linkbot/prod url",
     "user": "::ssm /mongodb/user/tyler user",
     "password": "::ssm /mongodb/user/tyler password"

@@ -43,3 +43,10 @@ deployments:
       LightsailInstance: LS1
       ComposeFile: "{{ file ./compose/prod.yml }}"
       Serial: 1
+      AppRolePolicies:
+        - Effect: Allow
+          Action: ssm:GetParameter
+          Resource:
+            - Fn::Sub: arn:aws:ssm:*:${AWS::AccountId}:parameter/mongodb/database/linkbot/prod
+            - Fn::Sub: arn:aws:ssm:*:${AWS::AccountId}:parameter/mongodb/user/tyler
+            - Fn::Sub: arn:aws:ssm:*:${AWS::AccountId}:parameter/discord/bot/link-bot
