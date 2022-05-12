@@ -1,18 +1,16 @@
-export type GeneralConfig = {
-    commandPrefix: string,
-    ownerId: string,
-    databaseArgs?: string[],
-}
-
-export type Secrets = {
-    dbProtocol: string,
-    dbUrl: string,
-    dbUser: string,
-    dbPassword: string,
-    discordToken: string,
-}
-
 export type Config = {
-    general: GeneralConfig,
-    secrets: Secrets,
-}
+    general: {
+        commandPrefix: string;
+        ownerId: string;
+    };
+    database: {
+        protocol: string;
+        url: string;
+        user: string;
+        password: string;
+        args: string[];
+    };
+    discord: {
+        token: string;
+    };
+};

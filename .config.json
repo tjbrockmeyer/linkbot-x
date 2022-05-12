@@ -1,0 +1,16 @@
+{
+  "general": {
+    "ownerId": "145710517250424832",
+    "commandPrefix": "!"
+  },
+  "database": {
+    "args": [],
+    "protocol": "::ssm /mongodb/database/linkbot/np protocol",
+    "url": "::ssm /mongodb/database/linkbot/prod url",
+    "user": "::ssm /mongodb/user/tyler user",
+    "password": "::ssm /mongodb/user/tyler password"
+  },
+  "discord": {
+    "token": "::ssm /discord/bot/link-bot token"
+  }
+}
