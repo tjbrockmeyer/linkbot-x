@@ -2,6 +2,7 @@ export type Config = {
     general: {
         commandPrefix: string;
         ownerId: string;
+        timezoneOffset: number;
     };
     database: {
         protocol: string;

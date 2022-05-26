@@ -1,3 +1,4 @@
+import { getConfigSync } from "../config";
 
 
 const msPerSecond = 1000;
@@ -7,7 +8,7 @@ const msPerDay = 24 * msPerHour;
 
 const isInvalidDate = (date: Date) => JSON.stringify(date) === 'null';
 const dateRegex = /(?:0?[1-9]|1[0-2])(\/|-)(?:0?[0-9]|[1-2][0-9]|3[0-1])\1(?:[1-9][0-9]{3}|[0-9]{2})/;
-const timezoneDifference = process.env.TIMEZONE_OFFSET ? Number(process.env.TIMEZONE_OFFSET) * msPerHour : 0;
+const timezoneDifference = getConfigSync().general.timezoneOffset * msPerHour;
 
 export const today = () => new Date(Number(new Date()) + timezoneDifference);
 export const tomorrow = () => new Date(Number(today()) + msPerDay);

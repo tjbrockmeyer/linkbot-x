@@ -1,4 +1,5 @@
-import { promises as fs } from 'fs';
+import fsp from 'fs/promises';
+import fs from 'fs';
 import aws from 'aws-sdk';
 import path from 'path';
 import type { Config } from './typings/Config';
@@ -10,7 +11,7 @@ let cachedConfig: Config;
 
 export const getConfig = async (): Promise<Config> => {
     if(!cachedConfig) {
-        const configContents = await fs.readFile(filePath, 'utf-8');
+        const configContents = await fsp.readFile(filePath, 'utf-8');
         const config = JSON.parse(configContents) as unknown;
         const errors: string[] = [];
         const baseName = path.basename(filePath).split('.')[0];
@@ -18,6 +19,15 @@ export const getConfig = async (): Promise<Config> => {
         if (errors.length) {
             throw new Error(`some errors ocurred while trying to parse the config file at ${filePath}:\n\t${errors.join('\n\t')}`);
         }
+    }
+    return cachedConfig;
+}
+
+// Does not resolve any references to external values.
+export const getConfigSync = (): Config => {
+    if(!cachedConfig) {
+        const configContents = fs.readFileSync(filePath, 'utf-8');
+        return JSON.parse(configContents) as Config;
     }
     return cachedConfig;
 }
