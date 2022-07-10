@@ -5,5 +5,5 @@ WORKDIR /app
 RUN npm ci
 RUN npm run build
 ENV NODE_ENV=production
-RUN npm ci
+RUN npm prune
 CMD npm start

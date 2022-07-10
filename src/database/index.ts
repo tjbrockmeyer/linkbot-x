@@ -13,7 +13,7 @@ export const withSession = async <T>(
             password,
         }
     } = await getConfig();
-    const uri = `${protocol}://${user}:${password}@${url}${!args || !args.length ? '' : ('?' + args.join('&'))}`;
+    const uri = `${protocol}://${user}:${password}@${url}/linkbot${!args || !args.length ? '' : ('?' + args.join('&'))}`;
     const client = await MongoClient.connect(uri);
     const session = client.startSession();
     const db = client.db(dbName, dbOptions);

@@ -6,12 +6,12 @@
   },
   "database": {
     "args": [],
-    "protocol": "::ssm /mongodb/database/linkbot/prod protocol",
-    "url": "::ssm /mongodb/database/linkbot/prod url",
-    "user": "::ssm /mongodb/user/tyler user",
-    "password": "::ssm /mongodb/user/tyler password"
+    "protocol": "::vault kv/data/database/mongodb-atlas/cluster/serverless protocol",
+    "url": "::vault kv/data/database/mongodb-atlas/cluster/serverless url",
+    "user": "::vault kv/data/database/mongodb-atlas/user/linkbot-prod user",
+    "password": "::vault kv/data/database/mongodb-atlas/user/linkbot-prod password"
   },
   "discord": {
-    "token": "::ssm /discord/bot/link-bot token"
+    "token": "::vault kv/data/api/discord/app/linkbot token"
   }
 }
