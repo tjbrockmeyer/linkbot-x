@@ -1,10 +1,8 @@
 version: '3'
 services:
   app:
-    restart: always
-    image: linkbot:latest
     build: '.'
     environment:
       - VAULT_ADDR=${VAULT_ADDR}
-      - VAULT_ROLE_ID=${VAULT_ROLE_ID}
-      - VAULT_SECRET_ID=${VAULT_SECRET_ID}
+      - VAULT_ROLE_ID=430c9ff4-6dde-c22e-3aa7-b91906854fad
+      - VAULT_WRAPPED_SECRET_ID=${VAULT_WRAPPED_SECRET_ID}

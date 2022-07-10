@@ -1,13 +1,13 @@
 import fsp from 'fs/promises';
 import fs from 'fs';
-import aws from 'aws-sdk';
+// import aws from 'aws-sdk';
 import nodeVault from 'node-vault';
 import path from 'path';
 import type { Config } from './typings/Config';
 import EventEmitter from 'events';
 import { bootstrap } from './bootstrap';
 
-const ssm = new aws.SSM();
+// const ssm = new aws.SSM();
 const filePath = '.config.json';
 
 const newVaultKvGetter = async () => {
@@ -52,8 +52,8 @@ let vaultKvGet: Awaited<ReturnType<typeof newVaultKvGetter>>;
 let cachedConfig: Config;
 
 export const getConfig = async (): Promise<Config> => {
-    await bootstrap();
     if(!cachedConfig) {
+        await bootstrap();
         const configContents = await fsp.readFile(filePath, 'utf-8');
         const config = JSON.parse(configContents) as unknown;
         const errors: string[] = [];
@@ -84,23 +84,23 @@ const parse = async (configValue: unknown, path: string, errors: string[]): Prom
         const split = configValue.split(' ');
         const directive = split[0];
         switch (directive.substring(2)) {
-            case 'ssm': {
-                const name = split[1];
-                const { Parameter: param } = await ssm.getParameter({ Name: name, WithDecryption: true }).promise();
-                if (!param || !param.Value) {
-                    errors.push(`at ${path}: ssm parameter ${name} is missing or empty`);
-                    return configValue;
-                }
-                const result = jsonParseOrSelf(param.Value);
-                if(split.length > 2) {
-                    if(typeof result !== 'object' || result === null) {
-                        errors.push(`at ${path}: ssm parameter is not an object/array, but an argument was provided to index into an object/array`);
-                        return configValue;
-                    }
-                    return (result as Record<string, unknown>)[split[2]];
-                }
-                return result;
-            }
+            // case 'ssm': {
+            //     const name = split[1];
+            //     const { Parameter: param } = await ssm.getParameter({ Name: name, WithDecryption: true }).promise();
+            //     if (!param || !param.Value) {
+            //         errors.push(`at ${path}: ssm parameter ${name} is missing or empty`);
+            //         return configValue;
+            //     }
+            //     const result = jsonParseOrSelf(param.Value);
+            //     if(split.length > 2) {
+            //         if(typeof result !== 'object' || result === null) {
+            //             errors.push(`at ${path}: ssm parameter is not an object/array, but an argument was provided to index into an object/array`);
+            //             return configValue;
+            //         }
+            //         return (result as Record<string, unknown>)[split[2]];
+            //     }
+            //     return result;
+            // }
             case 'vault': {
                 if(split.length !== 3) {
                     errors.push(`at ${path}: vault parameter has invalid number of arguments`);
