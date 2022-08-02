@@ -7,3 +7,4 @@ dist/
 types/
 .nyc_output/
 coverage/
+.vault-token

@@ -2,13 +2,9 @@ version: '3'
 services:
   app:
     build: '.'
-    environment:
-      - VAULT_ADDR=https://vault.${DOMAIN}
-      - VAULT_ROLE_ID=31023f39-1cc5-52bf-3cb1-81b7bc171a66
-      - VAULT_WRAPPED_SECRET_ID=${VAULT_WRAPPED_SECRET_ID}
     logging:
       driver: loki
       options:
-        loki-url: https://logs.${DOMAIN}/loki/api/v1/push
+        loki-url: https://logs.teabee.dev/loki/api/v1/push
         max-file: 2
         max-size: 200m
