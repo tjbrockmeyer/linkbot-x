@@ -2,6 +2,7 @@ import nodeVault from "node-vault";
 import fs from "fs/promises";
 import os from "os";
 import path from "path";
+import { stringifyError } from "./utils/objects";
 
 const getWrappedToken = async () => {
   if (process.env.NODE_ENV !== "production") {
@@ -34,11 +35,15 @@ const getWrappedToken = async () => {
           i++;
           await new Promise((resolve) => setTimeout(resolve, 1000));
           if (i > 30) {
-            console.error("timeout exceeded while waiting for the vault token");
+            console.error(
+              stringifyError(
+                new Error("timeout exceeded while waiting for the vault token")
+              )
+            );
             process.exit(1);
           }
         }
-        console.error(error);
+        console.error(stringifyError(error));
         process.exit(1);
       }
     }
@@ -56,11 +61,7 @@ export const bootstrap = async () => {
     } = await vault.write("sys/wrapping/unwrap", {});
     process.env.VAULT_SECRET_ID = secret_id;
   } catch (error) {
-    const msg =
-      typeof error === "object" && error !== null && "response" in error
-        ? JSON.stringify((error as { response: any }).response)
-        : error;
-    console.error(msg);
+    console.error(stringifyError(error));
     process.exit(1);
   }
 };
