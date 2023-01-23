@@ -1,3 +1,6 @@
+# private
+.env
+.database
 
 # dependencies
 node_modules/

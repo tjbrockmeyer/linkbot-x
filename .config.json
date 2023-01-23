@@ -2,16 +2,16 @@
   "general": {
     "ownerId": "145710517250424832",
     "commandPrefix": "!",
-    "timezoneOffset": -5
+    "timezoneOffset": 0
   },
   "database": {
     "args": [],
-    "protocol": "::vault kv/data/database/mongodb-atlas/cluster/serverless protocol",
-    "url": "::vault kv/data/database/mongodb-atlas/cluster/serverless url",
-    "user": "::vault kv/data/database/mongodb-atlas/user/linkbot-prod user",
-    "password": "::vault kv/data/database/mongodb-atlas/user/linkbot-prod password"
+    "protocol": "mongodb",
+    "url": "::env MONGODB_URL",
+    "user": "::env MONGODB_USER",
+    "password": "::env MONGODB_PASSWORD"
   },
   "discord": {
-    "token": "::vault kv/data/api/discord/app/linkbot token"
+    "token": "::env DISCORD_TOKEN"
   }
 }

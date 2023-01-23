@@ -6,9 +6,7 @@
   "scripts": {
     "build": "tsc",
     "start": "node dist",
-    "dev": "bash -c \"VAULT_ROLE_ID=$(vault read -field=role_id auth/approle/role/linkbot-prod/role-id) nodemon src/index.ts\"",
-    "docker:local:build": "docker compose -f config/docker-compose.local.yml build",
-    "docker:local:up": "bash -c \"vault write -f -wrap-ttl=60s -field=wrapping_token auth/approle/role/linkbot-prod/secret-id > .vault-token && docker compose -f config/docker-compose.local.yml up\"",
+    "dev": "nodemon src/index.ts",
     "test": "nyc --check-coverage --reporter text mocha --reporter spec",
     "test:min": "nyc --check-coverage --reporter text-summary mocha --reporter min",
     "test:cov": "rimraf coverage && nyc --no-check-coverage --reporter html mocha --reporter progress && open-cli coverage/index.html",
@@ -22,7 +20,6 @@
     "discord.js": "^13.2.0",
     "mongodb": "^4.1.3",
     "natural": "^5.1.1",
-    "node-vault": "^0.9.22",
     "uuid": "^8.3.2"
   },
   "devDependencies": {
