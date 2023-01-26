@@ -19,7 +19,7 @@ services:
     restart: always
     build:
       context: '..'
-      dockerfile: ./dockerfile
+      dockerfile: ./docker/Dockerfile
     env_file:
       - ../.env
     logging:
