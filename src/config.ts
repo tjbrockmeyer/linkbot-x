@@ -5,8 +5,6 @@ import type { Config } from './typings/Config';
 
 const filePath = '.config.json';
 
-type Awaited<T> = T extends Promise<infer K> ? K : T;
-
 let cachedConfig: Config;
 
 export const getConfig = async (): Promise<Config> => {
@@ -16,7 +14,6 @@ export const getConfig = async (): Promise<Config> => {
         const errors: string[] = [];
         const baseName = path.basename(filePath).split('.')[0];
         cachedConfig = await parse(config, baseName, errors) as Config;
-        console.log(JSON.stringify(cachedConfig, null, 2))
         if (errors.length) {
             throw new Error(`some errors ocurred while trying to parse the config file at ${filePath}:\n\t${errors.join('\n\t')}`);
         }

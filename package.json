@@ -5,8 +5,7 @@
   "main": "index.js",
   "scripts": {
     "build": "tsc",
-    "start": "node dist",
-    "dev": "nodemon src/index.ts",
+    "dev": "sudo docker compose -f docker/compose.dev.yml up -d && trap 'sudo docker compose -f docker/compose.dev.yml down' EXIT && nodemon -r dotenv/config src/index.ts",
     "test": "nyc --check-coverage --reporter text mocha --reporter spec",
     "test:min": "nyc --check-coverage --reporter text-summary mocha --reporter min",
     "test:cov": "rimraf coverage && nyc --no-check-coverage --reporter html mocha --reporter progress && open-cli coverage/index.html",

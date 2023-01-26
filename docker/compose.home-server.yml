@@ -1,26 +1,30 @@
 version: '3'
 services:
   database:
+    restart: always
     image: mongo:latest
-    environment:
+    env_file:
+      - ../.env
     volumes:
       - ./.database:/data/db
     logging:
       driver: loki
       options:
-        loki-url: https://logs.teabee.dev/loki/api/v1/push
+        loki-url: https://sys.teabee.dev/loki/api/v1/push
         max-file: 2
         max-size: 200m
   app:
-    build: '.'
-    restart: always
     depends_on:
       - database
+    restart: always
+    build:
+      context: '..'
+      dockerfile: ./dockerfile
     env_file:
-      - .env
+      - ../.env
     logging:
       driver: loki
       options:
-        loki-url: https://logs.teabee.dev/loki/api/v1/push
+        loki-url: https://sys.teabee.dev/loki/api/v1/push
         max-file: 2
         max-size: 200m
