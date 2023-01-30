@@ -2,7 +2,7 @@
   "general": {
     "ownerId": "145710517250424832",
     "commandPrefix": "!",
-    "timezoneOffset": 0
+    "timezoneOffset": -6
   },
   "database": {
     "args": [],
