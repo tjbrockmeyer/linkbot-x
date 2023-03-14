@@ -8,7 +8,7 @@ steps:
     image: node:18.15.0
     commands:
       - npm ci
-      - npm test:ci
+      - npm run test:ci
   - name: build-push
     image: plugins/docker
     settings:
