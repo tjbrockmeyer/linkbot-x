@@ -1,0 +1,18 @@
+---
+kind: pipeline
+type: docker
+name: test-build-push-deploy
+
+steps:
+  - name: test
+    image: node:18.15.0
+    commands:
+      - npm ci
+      - npm test:ci
+  - name: build-push
+    image: plugins/docker
+    settings:
+      repo: cr.teabee.dev/linkbot
+      tags: latest
+      dockerfile: docker/Dockerfile
+      cache_from: cr.teabee.dev/linkbot:latest
