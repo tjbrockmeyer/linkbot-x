@@ -1,4 +1,4 @@
-FROM node:16-alpine3.14 as build
+FROM node:18.15.0-alpine3.17 as build
 WORKDIR /app
 COPY package.json package-lock.json ./
 RUN npm ci
@@ -11,7 +11,7 @@ RUN npm run build && \
 # ===========
 # FINAL IMAGE
 # ===========
-FROM node:16-alpine3.14
+FROM node:18.15.0-alpine3.17
 WORKDIR /app
 COPY --from=build /app/node_modules node_modules
 COPY --from=build /app/dist dist

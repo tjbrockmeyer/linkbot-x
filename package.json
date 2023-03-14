@@ -22,7 +22,7 @@
     "uuid": "^8.3.2"
   },
   "devDependencies": {
-    "@istanbuljs/nyc-config-typescript": "^1.0.1",
+    "@istanbuljs/nyc-config-typescript": "^1.0.2",
     "@types/chai": "^4.2.22",
     "@types/mocha": "^9.0.0",
     "@types/natural": "^5.0.0",
@@ -74,7 +74,8 @@
       "src/database/**/*.ts",
       "src/bot/data/*.ts",
       "src/bot/index.ts",
-      "src/config/*.ts"
+      "src/config.ts",
+      "docker"
     ],
     "branches": 90,
     "lines": 90,

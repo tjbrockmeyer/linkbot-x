@@ -6,6 +6,7 @@ import * as messageErrorActions from '../../../src/bot/actions/messageErrorActio
 import { expect } from "chai";
 import emoji from "../../../src/bot/data/emoji";
 import { SinonStub, stub } from "sinon";
+import { stringifyError } from "../../utils/objects";
 
 
 describe('bot commands', () => {

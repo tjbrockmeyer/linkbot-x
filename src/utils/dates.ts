@@ -8,11 +8,14 @@ const msPerDay = 24 * msPerHour;
 
 const isInvalidDate = (date: Date) => JSON.stringify(date) === 'null';
 const dateRegex = /(?:0?[1-9]|1[0-2])(\/|-)(?:0?[0-9]|[1-2][0-9]|3[0-1])\1(?:[1-9][0-9]{3}|[0-9]{2})/;
-const timezoneDifference = getConfigSync().general.timezoneOffset * msPerHour;
+const timezoneDifference = (getConfigSync().general.timezoneOffset - new Date().getTimezoneOffset() / 60) * msPerHour;
 
-export const today = () => new Date(Number(new Date()) + timezoneDifference);
-export const tomorrow = () => new Date(Number(today()) + msPerDay);
-export const yesterday = () => new Date(Number(today()) - msPerDay);
+const todayMs = () => Date.now() - timezoneDifference;
+export const today = () => new Date(todayMs());
+export const tomorrow = () => new Date(todayMs() + msPerDay);
+export const yesterday = () => new Date(todayMs() - msPerDay);
+
+console.log(today().toLocaleString(), '\n', tomorrow().toLocaleString(), '\n', yesterday().toLocaleString());
 
 export const findDateInText = (text: string): Date|null => {
     const words = text.split(' ');

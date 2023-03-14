@@ -35,7 +35,7 @@ export const runCommand = async (
   try {
     await command.run(client, message, text);
   } catch (error) {
-    console.error(stringifyError(error));
+    console.error(error);
     saveMessageError(message, error as Error);
   }
 };
