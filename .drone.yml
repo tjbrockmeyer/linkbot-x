@@ -16,6 +16,6 @@ steps:
     image: plugins/docker
     settings:
       repo: cr.teabee.dev/linkbot
-      tags: ${DRONE_BRANCH:+latest}${DRONE_TAG}
+      tags: ${DRONE_TAG:-master}
       dockerfile: docker/Dockerfile
       cache_from: cr.teabee.dev/linkbot:latest
