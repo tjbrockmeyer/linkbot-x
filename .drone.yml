@@ -5,10 +5,7 @@ type: docker
 trigger:
   ref:
     - refs/heads/master
-    - refs/tags/v*.*.*
-  event:
-    - push
-    - tag
+    - refs/tags/v*
 steps:
   - name: test
     image: node:18.15.0
