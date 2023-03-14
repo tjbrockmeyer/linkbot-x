@@ -1,5 +1,5 @@
 ---
-name: test-and-build
+name: test and build
 kind: pipeline
 type: docker
 trigger:
