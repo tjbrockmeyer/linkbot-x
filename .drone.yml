@@ -1,96 +1,32 @@
 ---
-kind: pipeline
-name: test and build
-type: docker
-trigger:
-  branch:
-    - master
-  event:
-    - push
-  paths:
+kind: template
+load: test-build.yaml
+data:
+  type: push
+  source_files:
     - 'package*.json'
     - 'tsconfig.json'
     - 'src/**/*.ts'
     - '.config.json'
-    - 'docker/Dockerfile'
-steps:
-  - name: test
-    when:
-      paths:
-        include: [ '*' ]
-        exclude: [ 'docker/Dockerfile' ]
-    image: node:18.15.0
-    commands:
-      - npm ci
-      - npm run test:ci
-  - name: build-latest
-    image: plugins/docker
-    settings:
-      repo: cr.teabee.dev/linkbot
-      tags: latest
-      dockerfile: docker/Dockerfile
-      cache_from: cr.teabee.dev/linkbot:latest
+  dockerfile: docker/Dockerfile
+  test_image: node:18.15.0
+  test_commands:
+    - npm ci
+    - npm run test:ci
 
 ---
-kind: pipeline
-name: test and build tag
-type: docker
-trigger:
-  event:
-    - tag
-  action:
-    - create
-steps:
-  - name: test
-    image: node:18.15.0
-    commands:
-      - npm ci
-      - npm run test:ci
-  - name: build-tag
-    image: plugins/docker
-    settings:
-      repo: cr.teabee.dev/linkbot
-      tags: ${DRONE_TAG}
-      dockerfile: docker/Dockerfile
-      cache_from: cr.teabee.dev/linkbot:latest
+kind: template
+load: test-build.yaml
+data:
+  type: tag
+  dockerfile: docker/Dockerfile
+  test_image: node:18.15.0
+  test_commands:
+    - npm ci
+    - npm run test:ci
 
 ---
-kind: pipeline
-name: deploy
-type: docker
-trigger:
-  ref:
-    - refs/tags/v*
-  event:
-    - promote
-    - rollback
-  target:
-    - production
-steps:
-  - name: copy compose file
-    image: appleboy/drone-scp:1.6.6
-    settings:
-      host: teabee.dev
-      username: tyler
-      key:
-        from_secret: sshKey
-      passphrase:
-        from_secret: sshKeyPassphrase
-      source: docker/compose.home-server.yml
-      target: /tmp/${DRONE_REPO}
-      overwrite: true
-  - name: deploy
-    image: appleboy/drone-ssh:1.6.10
-    settings:
-      host: teabee.dev
-      username: tyler
-      key:
-        from_secret: sshKey
-      passphrase:
-        from_secret: sshKeyPassphrase
-      script:
-        - cd /home/tyler/lab/deployments/
-        - mkdir -p ${DRONE_REPO}
-        - cd ${DRONE_REPO}
-        - mv /tmp/${DRONE_REPO}/docker/compose.home-server.yml compose.yml
-        - LINKBOT_VERSION=${DRONE_TAG} docker compose up -d
+kind: template
+load: deploy-via-ssh.yaml
+data:
+  compose_file: docker/compose.home-server.yml

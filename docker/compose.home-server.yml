@@ -19,7 +19,7 @@ services:
     depends_on:
       database:
         condition: service_healthy
-    image: cr.teabee.dev/linkbot:${LINKBOT_VERSION:?}
+    image: cr.teabee.dev/linkbot:${IMAGE_TAG:?}
     environment:
       - MONGODB_URL=database
       - MONGODB_USER=${MONGODB_USER:?}
