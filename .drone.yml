@@ -11,24 +11,17 @@ trigger:
     - tag
 steps:
   - name: test
-    image: node:18.15.0
-    commands:
-      - npm ci
-      - npm run test:ci
     when:
       paths:
         - 'package*.json'
         - 'tsconfig.json'
         - 'src/**/*.ts'
         - '.config.json'
-  - &build-latest
-    name: build-latest
-    image: plugins/docker
-    settings:
-      repo: cr.teabee.dev/linkbot
-      tags: ${DRONE_TAG:-latest}
-      dockerfile: docker/Dockerfile
-      cache_from: cr.teabee.dev/linkbot:latest
+    image: node:18.15.0
+    commands:
+      - npm ci
+      - npm run test:ci
+  - name: build-latest
     when:
       branch:
         - master
@@ -38,11 +31,22 @@ steps:
         - 'src/**/*.ts'
         - '.config.json'
         - 'docker/Dockerfile'
-  - <<: *build-latest
-    name: build-tag
+    image: plugins/docker
+    settings:
+      repo: cr.teabee.dev/linkbot
+      tags: latest
+      dockerfile: docker/Dockerfile
+      cache_from: cr.teabee.dev/linkbot:latest
+  - name: build-tag
     when:
       event:
         - tag
+    image: plugins/docker
+    settings:
+      repo: cr.teabee.dev/linkbot
+      tags: ${DRONE_TAG}
+      dockerfile: docker/Dockerfile
+      cache_from: cr.teabee.dev/linkbot:latest
 
 ---
 kind: pipeline
