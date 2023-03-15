@@ -2,7 +2,7 @@
 kind: template
 load: test-build.yaml
 data:
-  type: push
+  event: push
   source_files:
     - 'package*.json'
     - 'tsconfig.json'
@@ -18,7 +18,7 @@ data:
 kind: template
 load: test-build.yaml
 data:
-  type: tag
+  event: tag
   dockerfile: docker/Dockerfile
   test_image: node:18.15.0
   test_commands:
