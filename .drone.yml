@@ -78,7 +78,7 @@ steps:
         from_secret: sshKey
       passphrase:
         from_secret: sshKeyPassphrase
-      source: "<no value>"
+      source: "docker/compose.home-server.yml"
       target: /tmp/${DRONE_REPO}
       overwrite: true
   - name: deploy
@@ -94,5 +94,5 @@ steps:
         - cd /home/tyler/lab/deployments/
         - mkdir -p ${DRONE_REPO}
         - cd ${DRONE_REPO}
-        - mv /tmp/${DRONE_REPO}/<no value> compose.yml
+        - mv /tmp/${DRONE_REPO}/docker/compose.home-server.yml compose.yml
         - IMAGE_TAG=${DRONE_TAG} docker compose up -d
