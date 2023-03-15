@@ -6,6 +6,8 @@ trigger:
   ref:
     - refs/heads/master
     - refs/tags/v*
+  event:
+    - push
 steps:
   - name: test
     image: node:18.15.0
