@@ -21,7 +21,7 @@ services:
         condition: service_healthy
     image: cr.teabee.dev/linkbot:${LINKBOT_VERSION:?}
     environment:
-      - MONGODB_URL=mongo
+      - MONGODB_URL=database
       - MONGODB_USER=${MONGODB_USER:?}
       - MONGODB_PASSWORD=${MONGODB_PASSWORD:?}
       - DISCORD_TOKEN=${DISCORD_TOKEN:?}
