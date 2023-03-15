@@ -3,44 +3,50 @@ kind: pipeline
 name: test and build
 type: docker
 trigger:
-  ref:
-    - refs/heads/master
-    - refs/tags/v*
+  branch:
+    - master
   event:
     - push
-    - tag
+  paths:
+    - 'package*.json'
+    - 'tsconfig.json'
+    - 'src/**/*.ts'
+    - '.config.json'
+    - 'docker/Dockerfile'
 steps:
   - name: test
     when:
       paths:
-        - 'package*.json'
-        - 'tsconfig.json'
-        - 'src/**/*.ts'
-        - '.config.json'
+        include: [ '*' ]
+        exclude: [ 'docker/Dockerfile' ]
     image: node:18.15.0
     commands:
       - npm ci
       - npm run test:ci
   - name: build-latest
-    when:
-      branch:
-        - master
-      paths:
-        - 'package*.json'
-        - 'tsconfig.json'
-        - 'src/**/*.ts'
-        - '.config.json'
-        - 'docker/Dockerfile'
     image: plugins/docker
     settings:
       repo: cr.teabee.dev/linkbot
       tags: latest
       dockerfile: docker/Dockerfile
       cache_from: cr.teabee.dev/linkbot:latest
+
+---
+kind: pipeline
+name: test and build tag
+type: docker
+trigger:
+  event:
+    - tag
+  action:
+    - create
+steps:
+  - name: test
+    image: node:18.15.0
+    commands:
+      - npm ci
+      - npm run test:ci
   - name: build-tag
-    when:
-      event:
-        - tag
     image: plugins/docker
     settings:
       repo: cr.teabee.dev/linkbot
