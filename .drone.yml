@@ -39,9 +39,9 @@ steps:
     settings:
       host: teabee.dev
       username: tyler
-      ssh-key:
+      key:
         from_secret: sshKey
-      ssh-passphrase:
+      passphrase:
         from_secret: sshKeyPassphrase
       source: docker/compose.home-server.yml
       target: /home/tyler/lab/deployments/linkbot.yml
@@ -53,7 +53,7 @@ steps:
       username: tyler
       key:
         from_secret: sshKey
-      ssh-passphrase:
+      passphrase:
         from_secret: sshKeyPassphrase
       script:
         - cd /home/tyler/lab/deployments/
