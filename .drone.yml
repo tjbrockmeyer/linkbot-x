@@ -57,7 +57,42 @@ steps:
       cache_from: cr.teabee.dev/${DRONE_REPO}:latest
 
 ---
-kind: template
-load: deploy-via-ssh.yaml
-data:
-  compose_file: docker/compose.home-server.yml
+kind: pipeline
+name: deploy-tag
+type: docker
+trigger:
+  ref:
+    - refs/tags/v*
+  event:
+    - promote
+    - rollback
+  target:
+    - production
+steps:
+  - name: copy compose file
+    image: appleboy/drone-scp:1.6.6
+    settings:
+      host: teabee.dev
+      username: tyler
+      key:
+        from_secret: sshKey
+      passphrase:
+        from_secret: sshKeyPassphrase
+      source: "<no value>"
+      target: /tmp/${DRONE_REPO}
+      overwrite: true
+  - name: deploy
+    image: appleboy/drone-ssh:1.6.10
+    settings:
+      host: teabee.dev
+      username: tyler
+      key:
+        from_secret: sshKey
+      passphrase:
+        from_secret: sshKeyPassphrase
+      script:
+        - cd /home/tyler/lab/deployments/
+        - mkdir -p ${DRONE_REPO}
+        - cd ${DRONE_REPO}
+        - mv /tmp/${DRONE_REPO}/<no value> compose.yml
+        - IMAGE_TAG=${DRONE_TAG} docker compose up -d
