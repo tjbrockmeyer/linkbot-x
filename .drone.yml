@@ -93,4 +93,4 @@ steps:
         - mkdir -p ${DRONE_REPO}
         - cd ${DRONE_REPO}
         - mv /tmp/${DRONE_REPO}/docker/compose.home-server.yml compose.yml
-        - LINKBOT_VERSION=${DRONE_TAG} docker compose -p ${DRONE_REPO_NAME} -f ${DRONE_REPO_NAME}.yml up -d
+        - LINKBOT_VERSION=${DRONE_TAG} docker compose up -d
