@@ -9,12 +9,6 @@ trigger:
   event:
     - push
     - tag
-  paths:
-    - 'package*.json'
-    - 'tsconfig.json'
-    - 'src/**/*.ts'
-    - '.config.json'
-    - 'docker/**/*'
 steps:
   - name: test
     image: node:18.15.0
@@ -27,13 +21,27 @@ steps:
         - 'tsconfig.json'
         - 'src/**/*.ts'
         - '.config.json'
-  - name: build
+  - &build 
+    name: build
     image: plugins/docker
     settings:
       repo: cr.teabee.dev/linkbot
-      tags: ${DRONE_TAG:-master}
+      tags: ${DRONE_TAG:-latest}
       dockerfile: docker/Dockerfile
       cache_from: cr.teabee.dev/linkbot:latest
+    when:
+      branch:
+        - master
+      paths:
+        - 'package*.json'
+        - 'tsconfig.json'
+        - 'src/**/*.ts'
+        - '.config.json'
+        - 'docker/Dockerfile'
+  - <<: *build
+    when:
+      event:
+        - tag
 
 ---
 kind: pipeline
