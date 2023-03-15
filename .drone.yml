@@ -1,29 +1,87 @@
----
-kind: template
-load: test-build.yaml
-data:
-  event: push
-  source_files:
-    - 'package*.json'
-    - 'tsconfig.json'
-    - 'src/**/*.ts'
-    - '.config.json'
-  dockerfile: docker/Dockerfile
-  test_image: node:18.15.0
-  test_commands:
-    - npm ci
-    - npm run test:ci
+# ---
+# kind: template
+# load: test-build.yaml
+# data:
+#   event: push
+#   source_files:
+#     - 'package*.json'
+#     - 'tsconfig.json'
+#     - 'src/**/*.ts'
+#     - '.config.json'
+#   dockerfile: docker/Dockerfile
+#   test_image: node:18.15.0
+#   test_commands:
+#     - npm ci
+#     - npm run test:ci
+
+# ---
+# kind: template
+# load: test-build.yaml
+# data:
+#   event: tag
+#   dockerfile: docker/Dockerfile
+#   test_image: node:18.15.0
+#   test_commands:
+#     - npm ci
+#     - npm run test:ci
 
 ---
-kind: template
-load: test-build.yaml
-data:
-  event: tag
-  dockerfile: docker/Dockerfile
-  test_image: node:18.15.0
-  test_commands:
-    - npm ci
-    - npm run test:ci
+kind: pipeline
+name:  test-build-master 
+type: docker
+trigger:
+  branch:
+    - master
+  event:
+    - push
+  paths:
+    - package*.json
+    - tsconfig.json
+    - src/**/*.ts
+    - .config.json
+    - docker/Dockerfile
+steps:
+  - name: test
+    when:
+      paths:
+        include:
+          - '*'
+        exclude:
+          - docker/Dockerfile
+    image: node:18.15.0
+    commands:
+      - npm ci
+      - npm run test:ci
+  - name: build
+    image: plugins/docker:20.14.0
+    settings:
+      repo: cr.teabee.dev/${DRONE_REPO}
+      tags: latest
+      dockerfile: docker/Dockerfile
+      cache_from: cr.teabee.dev/${DRONE_REPO}:latest
+
+---
+kind: pipeline
+name:  test-build-tag 
+type: docker
+trigger:
+  event:
+    - tag
+  action:
+    - create
+steps:
+  - name: test
+    image: node:18.15.0
+    commands:
+      - npm ci
+      - npm run test:ci
+  - name: build
+    image: plugins/docker:20.14.0
+    settings:
+      repo: cr.teabee.dev/${DRONE_REPO}
+      tags: ${DRONE_TAG}
+      dockerfile: docker/Dockerfile
+      cache_from: cr.teabee.dev/${DRONE_REPO}:latest
 
 ---
 kind: template
