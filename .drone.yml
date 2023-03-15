@@ -49,18 +49,14 @@ kind: pipeline
 name: deploy
 type: docker
 trigger:
+  ref:
+    - refs/tags/v*
   event:
     - promote
     - rollback
   target:
     - production
 steps:
-  - name: deployment check
-    image: bash
-    environment:
-      TAG: ${DRONE_TAG}
-    commands:
-      - $${TAG:?only tagged releases are deployable to production}
   - name: copy compose file
     image: appleboy/drone-scp:1.6.6
     settings:
