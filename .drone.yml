@@ -55,6 +55,12 @@ trigger:
   target:
     - production
 steps:
+  - name: deployment check
+    image: bash
+    environment:
+      TAG: ${DRONE_TAG}
+    commands:
+      - $${TAG:?}
   - name: copy compose file
     image: appleboy/drone-scp:1.6.6
     settings:
@@ -65,7 +71,7 @@ steps:
       passphrase:
         from_secret: sshKeyPassphrase
       source: docker/compose.home-server.yml
-      target: /home/tyler/lab/deployments/linkbot.yml
+      target: /tmp/${DRONE_REPO}
       overwrite: true
   - name: deploy
     image: appleboy/drone-ssh:1.6.10
@@ -78,4 +84,5 @@ steps:
         from_secret: sshKeyPassphrase
       script:
         - cd /home/tyler/lab/deployments/
-        - LINKBOT_VERSION=${DRONE_TAG:?} docker compose -p linkbot -f linkbot.yml up -d
+        - mv /tmp/${DRONE_REPO}/docker/compose.home-server.yml ${DRONE_REPO_NAME}.yml
+        - LINKBOT_VERSION=${DRONE_TAG} docker compose -p ${DRONE_REPO_NAME} -f ${DRONE_REPO_NAME}.yml up -d
