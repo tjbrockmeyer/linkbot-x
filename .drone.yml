@@ -9,12 +9,24 @@ trigger:
   event:
     - push
     - tag
+  paths:
+    - 'package*.json'
+    - 'tsconfig.json'
+    - 'src/**/*.ts'
+    - '.config.json'
+    - 'docker/**/*'
 steps:
   - name: test
     image: node:18.15.0
     commands:
       - npm ci
       - npm run test:ci
+    when:
+      paths:
+        - 'package*.json'
+        - 'tsconfig.json'
+        - 'src/**/*.ts'
+        - '.config.json'
   - name: build
     image: plugins/docker
     settings:
@@ -57,4 +69,4 @@ steps:
         from_secret: sshKeyPassphrase
       script:
         - cd /home/tyler/lab/deployments/
-        - docker compose -p linkbot -f linkbot.yml up -d
+        - LINKBOT_VERSION=${DRONE_TAG:?} docker compose -p linkbot -f linkbot.yml up -d
