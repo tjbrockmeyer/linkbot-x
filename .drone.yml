@@ -60,7 +60,7 @@ steps:
     environment:
       TAG: ${DRONE_TAG}
     commands:
-      - $${TAG:?}
+      - $${TAG:?only tagged releases are deployable to production}
   - name: copy compose file
     image: appleboy/drone-scp:1.6.6
     settings:
