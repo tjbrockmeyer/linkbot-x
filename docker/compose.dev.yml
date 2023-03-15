@@ -1,11 +1,18 @@
-version: '3'
+version: '3.6'
 services:
   database:
     restart: always
-    image: mongo:latest
-    env_file:
-      - ../.env
+    image: mongo
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=${MONGODB_USER:?}
+      - MONGO_INITDB_ROOT_PASSWORD=${MONGODB_PASSWORD:?}
     volumes:
-      - ./.database:/data/db
+      - ./.abc:/data/db
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping').ok"]
+      interval: 10s
+      timeout: 10s
+      retries: 3
+      start_period: 20s
     ports:
       - 127.0.0.1:27017:27017

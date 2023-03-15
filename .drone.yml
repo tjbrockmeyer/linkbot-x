@@ -1,6 +1,6 @@
 ---
-name: test and build
 kind: pipeline
+name: test and build
 type: docker
 trigger:
   ref:
@@ -19,3 +19,39 @@ steps:
       tags: ${DRONE_TAG:-master}
       dockerfile: docker/Dockerfile
       cache_from: cr.teabee.dev/linkbot:latest
+
+---
+kind: pipeline
+name: deploy
+type: docker
+trigger:
+  event:
+    - promote
+    - rollback
+  target:
+    - production
+steps:
+  - name: copy compose file
+    image: appleboy/drone-scp:1.6.6
+    settings:
+      host: teabee.dev
+      username: tyler
+      ssh-key:
+        from_secret: sshKey
+      ssh-passphrase:
+        from_secret: sshKeyPassphrase
+      source: docker/compose.home-server.yml
+      target: /home/tyler/lab/deployments/linkbot.yml
+      overwrite: true
+  - name: deploy
+    image: appleboy/drone-ssh:1.6.10
+    settings:
+      host: teabee.dev
+      username: tyler
+      key:
+        from_secret: sshKey
+      ssh-passphrase:
+        from_secret: sshKeyPassphrase
+      script:
+        - cd /home/tyler/lab/deployments/
+        - docker compose -p linkbot -f linkbot.yml up -d
