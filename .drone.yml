@@ -8,6 +8,7 @@ trigger:
     - refs/tags/v*
   event:
     - push
+    - tag
 steps:
   - name: test
     image: node:18.15.0
