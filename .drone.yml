@@ -21,8 +21,8 @@ steps:
         - 'tsconfig.json'
         - 'src/**/*.ts'
         - '.config.json'
-  - &build 
-    name: build
+  - &build-latest
+    name: build-latest
     image: plugins/docker
     settings:
       repo: cr.teabee.dev/linkbot
@@ -38,7 +38,8 @@ steps:
         - 'src/**/*.ts'
         - '.config.json'
         - 'docker/Dockerfile'
-  - <<: *build
+  - <<: *build-latest
+    name: build-tag
     when:
       event:
         - tag
