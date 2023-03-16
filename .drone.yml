@@ -1,6 +1,6 @@
 ---
 kind: template
-load: test-build.yaml
+load: test-and-build:1.0.0.yaml
 data: &test-build
   event: push
   dockerfile: docker/Dockerfile
@@ -11,7 +11,7 @@ data: &test-build
 
 ---
 kind: template
-load: test-build.yaml
+load: test-and-build:1.0.0.yaml
 data:
   event: tag
   dockerfile: docker/Dockerfile
