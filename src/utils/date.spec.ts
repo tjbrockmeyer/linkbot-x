@@ -1,5 +1,5 @@
 import { expect } from "chai"
-import { findDateInText } from './dates';
+import { findDateInText, today, tomorrow, yesterday } from './dates';
 
 describe('utils date', () => {
 
@@ -9,9 +9,9 @@ describe('utils date', () => {
             {text: '05/30/40', date: new Date(2040, 4, 30)},
             {text: '05-30-1999', date: new Date(1999, 4, 30)},
             {text: 'my birthday is on 12/01/2020', date: new Date(2020, 11, 1)},
-            {text: 'is today my birthday?', date: new Date(new Date().getFullYear(), new Date().getMonth(), new Date().getDate())},
-            {text: 'tomorrow must be your birthday', date: new Date(new Date().getFullYear(), new Date().getMonth(), new Date().getDate() + 1)},
-            {text: 'register my birthday as yesterday', date: new Date(new Date().getFullYear(), new Date().getMonth(), new Date().getDate() - 1)},
+            {text: 'is today my birthday?', date: new Date(today().getFullYear(), today().getMonth(), today().getDate())},
+            {text: 'tomorrow must be your birthday', date: new Date(tomorrow().getFullYear(), tomorrow().getMonth(), tomorrow().getDate())},
+            {text: 'register my birthday as yesterday', date: new Date(yesterday().getFullYear(), yesterday().getMonth(), yesterday().getDate())},
         ].forEach(({text, date}) => it(`should parse '${text}' to '${date}'`, () => {
             const result = findDateInText(text);
             expect(result).deep.equals(date);
