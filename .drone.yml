@@ -10,25 +10,15 @@ data: &test-build
     - npm run test:ci
 
 ---
-kind: pipeline
-name: test-build-tag
-type: docker
-trigger:
-  event:
-    - tag
-steps:
-  - name: test
-    image: node:18.15.0
-    commands:
-      - npm ci
-      - npm run test:ci
-  - name: build
-    image: plugins/docker:20.14.0
-    settings:
-      repo: cr.teabee.dev/${DRONE_REPO}
-      tags: ${DRONE_TAG}
-      dockerfile: docker/Dockerfile
-      cache_from: cr.teabee.dev/${DRONE_REPO}:latest
+kind: template
+load: test-build.yaml
+data:
+  event: tag
+  dockerfile: docker/Dockerfile
+  test_image: node:18.15.0
+  test_commands:
+    - npm ci
+    - npm run test:ci
 
 ---
 kind: template
