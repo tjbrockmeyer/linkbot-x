@@ -14,8 +14,6 @@ export const today = () => new Date(todayMs());
 export const tomorrow = () => new Date(todayMs() + msPerDay);
 export const yesterday = () => new Date(todayMs() - msPerDay);
 
-console.log(today(), '\n', tomorrow(), '\n', yesterday());
-
 export const findDateInText = (text: string): Date|null => {
     const words = text.split(' ');
     const foundDateWord = words.find(x => !isInvalidDate(new Date(x)) && Number(new Date(x)) !== 0);
