@@ -1,5 +1,5 @@
-import {getConfig} from '../../config'
+import {config} from '../../config'
 
-export const isAdmin = async (userId: string) => {
-    return (await getConfig()).general.ownerId === userId;
+export const isAdmin = (userId: string) => {
+    return config.general.ownerId === userId;
 }

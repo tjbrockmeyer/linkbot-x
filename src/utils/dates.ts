@@ -1,5 +1,4 @@
-import { getConfigSync } from "../config";
-
+import { config } from "../config";
 
 const msPerSecond = 1000;
 const msPerMinute = 60 * msPerSecond;
@@ -8,14 +7,14 @@ const msPerDay = 24 * msPerHour;
 
 const isInvalidDate = (date: Date) => JSON.stringify(date) === 'null';
 const dateRegex = /(?:0?[1-9]|1[0-2])(\/|-)(?:0?[0-9]|[1-2][0-9]|3[0-1])\1(?:[1-9][0-9]{3}|[0-9]{2})/;
-const timezoneDifference = (getConfigSync().general.timezoneOffset - new Date().getTimezoneOffset() / 60) * msPerHour;
+const timezoneDifference = -config.general.timezoneOffset * msPerHour;
 
-const todayMs = () => Date.now() - timezoneDifference;
+const todayMs = () => Date.now() + timezoneDifference;
 export const today = () => new Date(todayMs());
 export const tomorrow = () => new Date(todayMs() + msPerDay);
 export const yesterday = () => new Date(todayMs() - msPerDay);
 
-console.log(today().toLocaleString(), '\n', tomorrow().toLocaleString(), '\n', yesterday().toLocaleString());
+console.log(today(), '\n', tomorrow(), '\n', yesterday());
 
 export const findDateInText = (text: string): Date|null => {
     const words = text.split(' ');

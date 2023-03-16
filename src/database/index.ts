@@ -1,6 +1,6 @@
 import {MongoClient, DbOptions} from 'mongodb';
 import { DbContext as database } from './../typings/DbContext';
-import {getConfig} from '../config';
+import { config } from '../config';
 
 export const withSession = async <T>(
         task: (ctx: database) => Promise<T>, dbName: string|undefined = undefined, dbOptions: DbOptions|undefined = undefined): Promise<T> => {
@@ -12,7 +12,7 @@ export const withSession = async <T>(
             user,
             password,
         }
-    } = await getConfig();
+    } = config;
     const uri = `${protocol}://${user}:${password}@${url}/admin${!args || !args.length ? '' : ('?' + args.join('&'))}`;
     const client = await MongoClient.connect(uri);
     const session = client.startSession();

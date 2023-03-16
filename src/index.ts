@@ -1,13 +1,11 @@
 import bot from "./bot";
-import { getConfig } from "./config";
+import { config } from "./config";
 import ensureCollections from "./database/ensureCollections";
 import { withSession } from "./database";
 import { stringifyError } from "./utils/objects";
 
 const main = async () => {
-  const {
-    discord: { token },
-  } = await getConfig();
+  const { discord: { token } } = config
   withSession(async (ctx) => await ensureCollections(ctx)).catch((error) =>
     console.error(stringifyError(error))
   );

@@ -1,10 +1,9 @@
 import { expect } from "chai"
-import {findDateInText} from './dates';
+import { findDateInText } from './dates';
 
 describe('utils date', () => {
 
     describe('findDateInText', () => {
-
         [
             {text: 'set my birthday to 9/2/94', date: new Date(1994, 8, 2)},
             {text: '05/30/40', date: new Date(2040, 4, 30)},
