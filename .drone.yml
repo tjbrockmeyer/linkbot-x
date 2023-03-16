@@ -13,8 +13,12 @@ data: &test-build
 kind: template
 load: test-build.yaml
 data:
-  <<: *test-build
   event: tag
+  dockerfile: docker/Dockerfile
+  test_image: node:18.15.0
+  test_commands:
+    - npm ci
+    - npm run test:ci
 
 ---
 kind: template
