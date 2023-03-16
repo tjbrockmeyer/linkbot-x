@@ -1,27 +1,18 @@
 ---
 kind: template
-load: test-and-build:1.0.0.yaml
-data: &test-build
-  event: push
-  dockerfile: docker/Dockerfile
-  test_image: node:18.15.0
-  test_commands:
-    - npm ci
-    - npm run test:ci
-
----
-kind: template
-load: test-and-build:1.0.0.yaml
+load: template:1.yaml
 data:
-  event: tag
-  dockerfile: docker/Dockerfile
-  test_image: node:18.15.0
-  test_commands:
-    - npm ci
-    - npm run test:ci
-
----
-kind: template
-load: deploy-via-ssh.yaml
-data:
-  compose_file: docker/compose.home-server.yml
+  test_and_build:
+    - input: &test-build
+        event: push
+        dockerfile: docker/Dockerfile
+        test_image: node:18.15.0
+        test_commands:
+          - npm ci
+          - npm run test:ci
+    - input:
+        <<: *test-build
+        event: tag
+  deploy_via_ssh:
+    - input:
+        compose_file: docker/compose.home-server.yml
